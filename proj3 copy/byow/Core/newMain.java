@@ -3,6 +3,8 @@ import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 
+import java.util.Random;
+
 public class newMain {
     private static final int WIDTH = 60;
     private static final int HEIGHT = 30;
@@ -18,6 +20,14 @@ public class newMain {
             for (int y = 0; y < HEIGHT; y += 1) {
                 world[x][y] = Tileset.NOTHING;
             }
+        }
+        Random random = new Random();
+        for(int i = 0; i < 15; i ++) {
+            int x = RandomUtils.uniform(random, 50);
+            int y = RandomUtils.uniform(random, 25);
+            int length = RandomUtils.uniform(random, 10);
+            int width = RandomUtils.uniform(random, 10);
+            bigWorld.buildRoom(x, y, world, length, width);
         }
 
         // fills in a block 14 tiles wide by 4 tiles tall
