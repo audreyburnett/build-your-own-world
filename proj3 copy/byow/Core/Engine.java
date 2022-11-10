@@ -1,7 +1,9 @@
 package byow.Core;
+import java.util.Random;
 
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
+import byow.TileEngine.Tileset;
 
 public class Engine {
     TERenderer ter = new TERenderer();
@@ -37,7 +39,7 @@ public class Engine {
      * @param input the input string to feed to your program
      * @return the 2D TETile[][] representing the state of the world
      */
-    public TETile[][] interactWithInputString(String input) {
+    public static TETile[][] interactWithInputString(String input) {
         // TODO: Fill out this method so that it run the engine using the input
         // passed in as an argument, and return a 2D tile representation of the
         // world that would have been drawn if the same inputs had been given
@@ -45,8 +47,50 @@ public class Engine {
         //
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
+//        TERenderer ter = new TERenderer();
+//        ter.initialize(WIDTH, HEIGHT);
 
-        TETile[][] finalWorldFrame = null;
-        return finalWorldFrame;
+        // initialize tiles
+        TETile[][] world = new TETile[WIDTH][HEIGHT];
+        for (int x = 0; x < WIDTH; x += 1) {
+            for (int y = 0; y < HEIGHT; y += 1) {
+                world[x][y] = Tileset.WATER;
+            }
+        }
+        Long seed = Long.valueOf(input.substring(1, input.length() - 1));
+        Random rnd = new Random();
+        rnd.setSeed(seed);
+        int numRooms = rnd.nextInt(50);
+        int prevXCoord = 0;
+        int prevYCoord = 0;
+        int prevLength = 0;
+        int prevWidth = 0;
+        for(int i = 0; i < numRooms; i ++) {
+            room roomPrev = new room(prevXCoord, prevYCoord, prevLength, prevWidth);
+            int xCoord = rnd.nextInt(70);
+            int yCoord = rnd.nextInt(20);
+            int width = rnd.nextInt(10);
+            int length = rnd.nextInt(10);
+            if (width < 3 || length < 3) {
+                while (width < 3 || length < 3) {
+                    width = rnd.nextInt(10);
+                    length = rnd.nextInt(10);
+                }
+            }
+            room roomCurr = new room(xCoord, yCoord, width, length);
+            bigWorld.buildRoom(xCoord, yCoord, world, length, width);
+            if(i != 0){
+                room.connect(roomPrev, roomCurr, world);
+            }
+            prevXCoord = xCoord;
+            prevYCoord = yCoord;
+            prevLength = length;
+            prevWidth = width;
+
+        }
+
+
+//        TETile[][] finalWorldFrame = null;
+        return world;
     }
 }
