@@ -24,13 +24,26 @@ public class room {
         int bYCoord = roomB.y;
         int bLength = roomB.length;
         int bWidth = roomB.width;
-        if (aXCoord > bXCoord + roomB.width) {
+        if (aXCoord + aWidth < bXCoord ) {
             int distBetween = bXCoord - (aXCoord + aWidth);
-            int min = java.lang.Math.min(roomA.length, roomB.length);
-            int connectorY = (min / 2) + roomB.y;
-            bigWorld.buildRoom((aXCoord + aWidth), (connectorY - 1), world, 3, (distBetween + 2));
-            world[roomB.x + roomB.width][connectorY] = Tileset.MOUNTAIN;
-            world[roomA.x + roomA.width][connectorY] = Tileset.MOUNTAIN;
+            int connectorY = java.lang.Math.max(aYCoord, bYCoord);
+            bigWorld.buildRoom((aXCoord + aWidth), (connectorY), world, 3, (distBetween + 2));
+            for (int i = bXCoord + 1; i < bXCoord + bWidth - 1; i++){
+                world[i][connectorY + 1] = Tileset.MOUNTAIN;
+                world[i][connectorY + 2] = Tileset.MOUNTAIN;
+            }
+            world[aXCoord + aWidth][connectorY + 1] = Tileset.MOUNTAIN;
+            world[aXCoord + aWidth - 1][connectorY + 1] = Tileset.MOUNTAIN;
+        }
+        if (bYCoord > aYCoord + aLength){
+            int distBetween = bYCoord - (aYCoord + aLength);
+            int connectorX = java.lang.Math.max(aXCoord, bXCoord);
+            bigWorld.buildRoom((connectorX), (aYCoord + aLength), world, distBetween + 2, 3);
+            for (int i = bYCoord + 1; i < bYCoord + bLength - 1; i++) {
+                world[connectorX + 1][i] = Tileset.MOUNTAIN;
+            }
+            world[connectorX + 1][aYCoord + aLength] = Tileset.MOUNTAIN;
+            world[connectorX + 1][aYCoord + aLength - 1] = Tileset.MOUNTAIN;
         }
 
     }
