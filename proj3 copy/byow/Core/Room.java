@@ -1,21 +1,25 @@
 package byow.Core;
 
 import byow.TileEngine.TETile;
-import java.lang.Math;
+
+import java.util.HashSet;
+
 import byow.TileEngine.Tileset;
 
-public class room {
+public class Room {
     private int x;
     private int y;
     private int length;
     private int width;
-    public room(int x, int y, int length, int width){
+    private HashSet<Room> roomTracker= new HashSet<>();
+    public Room(int x, int y, int length, int width){
         this.x = x;
         this.y = y;
         this.length = length;
         this.width = width;
+        this.roomTracker.add(new Room(x,y,length,width));
     }
-    public static void connect(room roomA, room roomB, TETile[][] world){
+    public static void connect(Room roomA, Room roomB, TETile[][] world){
         int aXCoord = roomA.x;
         int aYCoord = roomA.y;
         int aLength = roomA.length;
@@ -45,6 +49,31 @@ public class room {
             world[connectorX + 1][aYCoord + aLength] = Tileset.MOUNTAIN;
             world[connectorX + 1][aYCoord + aLength - 1] = Tileset.MOUNTAIN;
         }
-
     }
+
+    public TETile[][] noOverlap(Room a, TETile[][] world) {
+        for (Room i : roomTracker) {
+            int left = i.x;
+            int right = i.x + i.width;
+            int bottom = i.y;
+            int top = i.y + i.length;
+            if (a.x  >= left && a.x <= right && a.y <= top && a.y >= bottom) {
+                //mutateRoom
+            } else if (a.x + a.width  >= left && a.x + a.width <= right && a.y <= top && a.y >= bottom) {
+
+            } else if (a.x  >= left && a.x <= right && a.y + a.length <= top && a.y + a.length >= bottom) {
+
+            } else if (a.x + a.width  >= left && a.x + a.width <= right && a.y + a.length <= top && a.y + a.length >= bottom) {
+
+            }
+        }
+        return world;
+    }
+
+    public void mutateRoom() {
+        //shrinks room if it overlaps
+    }
+
+
 }
+

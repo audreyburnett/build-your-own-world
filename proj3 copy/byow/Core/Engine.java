@@ -66,7 +66,7 @@ public class Engine {
         int prevLength = 0;
         int prevWidth = 0;
         for(int i = 0; i < numRooms; i ++) {
-            room roomPrev = new room(prevXCoord, prevYCoord, prevLength, prevWidth);
+            Room roomPrev = new Room(prevXCoord, prevYCoord, prevLength, prevWidth);
             int xCoord = rnd.nextInt(70);
             int yCoord = rnd.nextInt(20);
             int width = rnd.nextInt(10);
@@ -77,10 +77,10 @@ public class Engine {
                     length = rnd.nextInt(10);
                 }
             }
-            room roomCurr = new room(xCoord, yCoord, width, length);
+            Room roomCurr = new Room(xCoord, yCoord, width, length);
             bigWorld.buildRoom(xCoord, yCoord, world, length, width);
             if(i != 0){
-                room.connect(roomPrev, roomCurr, world);
+                Room.connect(roomPrev, roomCurr, world);
             }
             prevXCoord = xCoord;
             prevYCoord = yCoord;
