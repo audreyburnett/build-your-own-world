@@ -4,6 +4,7 @@ import java.util.Random;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
+import byow.Core.Room;
 
 public class Engine {
     TERenderer ter = new TERenderer();
@@ -78,14 +79,18 @@ public class Engine {
                 }
             }
             Room roomCurr = new Room(xCoord, yCoord, width, length);
-            bigWorld.buildRoom(xCoord, yCoord, world, length, width);
-            if(i != 0){
-                Room.connect(roomPrev, roomCurr, world);
+            if (Room.noOverlap(roomCurr)) {
+                bigWorld.buildRoom(xCoord, yCoord, world, length, width);
+                if (i != 0) {
+                    Room.connect(roomPrev, roomCurr, world);
+                }
+                Room.roomTrackerAdder(roomCurr);
+                prevXCoord = xCoord;
+                prevYCoord = yCoord;
+                prevLength = length;
+                prevWidth = width;
+
             }
-            prevXCoord = xCoord;
-            prevYCoord = yCoord;
-            prevLength = length;
-            prevWidth = width;
 
         }
 
