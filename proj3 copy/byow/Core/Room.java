@@ -11,13 +11,13 @@ public class Room {
     private int y;
     private int length;
     private int width;
-    private HashSet<Room> roomTracker= new HashSet<>();
+    private static HashSet<Room> roomTracker= new HashSet<>();
     public Room(int x, int y, int length, int width){
         this.x = x;
         this.y = y;
         this.length = length;
         this.width = width;
-        this.roomTracker.add(new Room(x,y,length,width));
+        this.roomTracker = roomTracker;
     }
     public static void connect(Room roomA, Room roomB, TETile[][] world){
         int aXCoord = roomA.x;
@@ -49,25 +49,50 @@ public class Room {
             world[connectorX + 1][aYCoord + aLength] = Tileset.MOUNTAIN;
             world[connectorX + 1][aYCoord + aLength - 1] = Tileset.MOUNTAIN;
         }
+        if (bXCoord + bWidth < aXCoord) {
+            int distBetween = aXCoord - (bXCoord + bWidth);
+            int connectorY = java.lang.Math.max(bYCoord, aYCoord);
+            bigWorld.buildRoom((bXCoord + bWidth), (connectorY), world, 3, (distBetween + 2));
+            for (int i = aXCoord + 1; i < aXCoord + aWidth - 1; i++) {
+                world[i][connectorY + 1] = Tileset.MOUNTAIN;
+                world[i][connectorY + 2] = Tileset.MOUNTAIN;
+            }
+            world[bXCoord + bWidth][connectorY + 1] = Tileset.MOUNTAIN;
+            world[bXCoord + bWidth - 1][connectorY + 1] = Tileset.MOUNTAIN;
+        }
+        if (aYCoord > bYCoord + bLength) {
+            int distBetween = aYCoord - (bYCoord + bLength);
+            int connectorX = java.lang.Math.max(bXCoord, aXCoord);
+            bigWorld.buildRoom((connectorX), (bYCoord + bLength), world, distBetween + 2, 3);
+            for (int i = aYCoord + 1; i < aYCoord + aLength - 1; i++) {
+                world[connectorX + 1][i] = Tileset.MOUNTAIN;
+            }
+            world[connectorX + 1][bYCoord + bLength] = Tileset.MOUNTAIN;
+            world[connectorX + 1][bYCoord + bLength - 1] = Tileset.MOUNTAIN;
+        }
     }
 
-    public TETile[][] noOverlap(Room a, TETile[][] world) {
+    public static Boolean noOverlap(Room a) {
         for (Room i : roomTracker) {
             int left = i.x;
             int right = i.x + i.width;
             int bottom = i.y;
             int top = i.y + i.length;
             if (a.x  >= left && a.x <= right && a.y <= top && a.y >= bottom) {
-                //mutateRoom
+                return false;
             } else if (a.x + a.width  >= left && a.x + a.width <= right && a.y <= top && a.y >= bottom) {
-
+                return false;
             } else if (a.x  >= left && a.x <= right && a.y + a.length <= top && a.y + a.length >= bottom) {
-
+                return false;
             } else if (a.x + a.width  >= left && a.x + a.width <= right && a.y + a.length <= top && a.y + a.length >= bottom) {
-
+                return false;
             }
         }
-        return world;
+        return true;
+
+    }
+    public static void roomTrackerAdder(Room room){
+        roomTracker.add(room);
     }
 
     public void mutateRoom() {

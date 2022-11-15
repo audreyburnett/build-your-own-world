@@ -20,12 +20,23 @@ public class testerMain {
             }
         }
 
-        // fills in a block 14 tiles wide by 4 tiles tall
-        bigWorld.buildRoom(1, 1, world, 5, 4);
-        bigWorld.buildRoom(2, 8, world, 4, 3);
-        room roomA = new room(1,1, 5, 4);
-        room roomB = new room(2,8, 4, 3);
-        room.connect(roomA, roomB, world);
+        // tests if 2 rooms connect
+//        bigWorld.buildRoom(1, 1, world, 5, 4);
+//        bigWorld.buildRoom(2, 8, world, 4, 3);
+//        Room roomA = new Room(1,1, 5, 4);
+//        Room roomB = new Room(2,8, 4, 3);
+//        Room.connect(roomA, roomB, world);
+
+        //tests if overlap works
+        Room roomC = new Room(3,4, 4, 3);
+        Room roomD = new Room(24,6, 5, 3);
+        bigWorld.buildRoom(3, 5, world, 4, 3);
+        Room.roomTrackerAdder(roomC);
+        if(Room.noOverlap(roomD)) {
+            bigWorld.buildRoom(24, 6, world, 5, 3);
+        }
+
+
 
         // draws the world to the screen
         ter.renderFrame(world);

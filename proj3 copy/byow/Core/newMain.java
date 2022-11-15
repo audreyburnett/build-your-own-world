@@ -11,7 +11,7 @@ public class newMain {
         // initialize the tile rendering engine with a window of size WIDTH x HEIGHT
         TERenderer ter = new TERenderer();
         ter.initialize(WIDTH, HEIGHT);
-        TETile[][] finalWorld = Engine.interactWithInputString("n62s");
+        TETile[][] finalWorld = Engine.interactWithInputString("n456s");
 //        Random random = new Random();
 //        Long seed = random.nextLong(10000);
 //        for(int i = 0; i < 15; i ++) {
