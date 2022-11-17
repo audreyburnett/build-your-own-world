@@ -78,11 +78,11 @@ public class Engine {
                     length = rnd.nextInt(10);
                 }
             }
-            Room roomCurr = new Room(xCoord, yCoord, width, length);
-            if (Room.noOverlap(roomCurr)) {
+            Room roomCurr = new Room(xCoord, yCoord, length, width);
+            if (Room.overlap(roomCurr) == false) {
                 bigWorld.buildRoom(xCoord, yCoord, world, length, width);
                 if (i != 0) {
-                    Room.connect(roomPrev, roomCurr, world);
+//                    Room.connect(roomPrev, roomCurr, world);
                 }
                 Room.roomTrackerAdder(roomCurr);
                 prevXCoord = xCoord;

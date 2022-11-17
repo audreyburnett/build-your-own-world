@@ -11,7 +11,7 @@ public class bigWorld {
             world[start][y] = Tileset.SAND;
             world[start][java.lang.Math.abs(y + length - 1)] = Tileset.SAND;
         }
-        for(int upStart = y+1; upStart < y + length - 1; upStart ++){
+        for(int upStart = y; upStart < y + length; upStart ++){
             world[x][upStart] = Tileset.SAND;
             world[java.lang.Math.abs(x+width - 1)][upStart] = Tileset.SAND;
         }

@@ -72,32 +72,32 @@ public class Room {
         }
     }
 
-    public static Boolean noOverlap(Room a) {
+    public static Boolean overlap(Room a) {
         for (Room i : roomTracker) {
             int left = i.x;
-            int right = i.x + i.width;
+            int right = i.x + i.width - 1;
             int bottom = i.y;
-            int top = i.y + i.length;
-            if (a.x  >= left && a.x <= right && a.y <= top && a.y >= bottom) {
-                return false;
-            } else if (a.x + a.width  >= left && a.x + a.width <= right && a.y <= top && a.y >= bottom) {
-                return false;
-            } else if (a.x  >= left && a.x <= right && a.y + a.length <= top && a.y + a.length >= bottom) {
-                return false;
-            } else if (a.x + a.width  >= left && a.x + a.width <= right && a.y + a.length <= top && a.y + a.length >= bottom) {
-                return false;
+            int top = i.y + i.length - 1;
+            if (a.x >= left && a.x <= right - 1 && a.y <= top - 1 && a.y >= bottom) {
+                return true;
+            } else if (a.x + a.width - 1 >= left && a.x + a.width - 1 <= right && a.y <= top && a.y >= bottom) {
+                return true;
+            } else if (a.x  >= left && a.x <= right && a.y + a.length - 1 <= top && a.y + a.length - 1 >= bottom) {
+                return true;
+            } else if (a.x + a.width - 1 >= left && a.x + a.width - 1 <= right && a.y + a.length - 1 <= top && a.y + a.length - 1 >= bottom) {
+                return true;
             }
         }
-        return true;
+        return false;
 
     }
     public static void roomTrackerAdder(Room room){
         roomTracker.add(room);
     }
 
-    public void mutateRoom() {
-        //shrinks room if it overlaps?
-    }
+//    public void mutateRoom() {
+//        if ()
+//    }
 
 
 }
