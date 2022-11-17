@@ -5,122 +5,133 @@ import byow.TileEngine.TETile;
 import java.util.HashSet;
 
 import byow.TileEngine.Tileset;
+import java.util.HashMap;
+import java.util.ArrayList;
 
 public class Room {
     private int x;
     private int y;
     private int length;
     private int width;
-    private static HashSet<Room> roomTracker= new HashSet<>();
-    public Room(int x, int y, int length, int width){
+    private static HashSet<Room> roomTracker = new HashSet<>();
+    private static HashSet<Coordinate> doorTracker = new HashSet<Coordinate>();
+
+    public Room(int x, int y, int length, int width) {
         this.x = x;
         this.y = y;
         this.length = length;
         this.width = width;
         this.roomTracker = roomTracker;
     }
-    public static void connect(Room roomA, Room roomB, TETile[][] world){
-        int aXCoord = roomA.x;
-        int aYCoord = roomA.y;
-        int aLength = roomA.length;
-        int aWidth = roomA.width;
-        int bXCoord = roomB.x;
-        int bYCoord = roomB.y;
-        int bLength = roomB.length;
-        int bWidth = roomB.width;
-        if (aXCoord + aWidth < bXCoord ) {
-            int distBetween = bXCoord - (aXCoord + aWidth);
-            int connectorY = java.lang.Math.max(aYCoord, bYCoord);
-            bigWorld.buildRoom((aXCoord + aWidth), (connectorY), world, 3, (distBetween + 2));
-            for (int i = bXCoord + 1; i < bXCoord + bWidth - 1; i++){
-                world[i][connectorY + 1] = Tileset.MOUNTAIN;
-                world[i][connectorY + 2] = Tileset.MOUNTAIN;
+    /** returns arraylist with orig coord first and first wall hit coord second*/
+    public static ArrayList hallwayFinderRight(Room origin, TETile[][] world){
+        int right = origin.x + origin.width - 1;
+        int bottom = origin.y;
+        int top = origin.y + origin.length -1;
+        ArrayList answer = new ArrayList();
+        for(int wallY = bottom + 1; wallY < top; wallY++){
+            int currY = wallY;
+            int currX = right;
+            for(int probe = right; probe < 79; probe++){
+                if(world[probe + 1][wallY] == Tileset.SAND){
+                    Coordinate originCoord = new Coordinate(currX, currY);
+                    Coordinate destinationCoord = new Coordinate(probe + 1, wallY);
+                    answer.add(originCoord);
+                    answer.add(destinationCoord);
+                    return answer;
+                }
             }
-            world[aXCoord + aWidth][connectorY + 1] = Tileset.MOUNTAIN;
-            world[aXCoord + aWidth - 1][connectorY + 1] = Tileset.MOUNTAIN;
         }
-        if (bYCoord > aYCoord + aLength){
-            int distBetween = bYCoord - (aYCoord + aLength);
-            int connectorX = java.lang.Math.max(aXCoord, bXCoord);
-            bigWorld.buildRoom((connectorX), (aYCoord + aLength), world, distBetween + 2, 3);
-            for (int i = bYCoord + 1; i < bYCoord + bLength - 1; i++) {
-                world[connectorX + 1][i] = Tileset.MOUNTAIN;
+        return null;
+    }
+    public static ArrayList hallwayFinderUp(Room origin, TETile[][] world){
+        int top = origin.y + origin.length - 1;
+        int left = origin.x;
+        int right = origin.x + origin.width - 1;
+        ArrayList answer = new ArrayList();
+        for(int wallX = left + 1; wallX < right; wallX ++){
+            int currX = wallX;
+            int currY = top;
+            for(int probe = top; probe < 29; probe++){
+                if(world[wallX][probe + 1] == Tileset.SAND){
+                    Coordinate originCoord = new Coordinate(currX, currY);
+                    Coordinate destinationCoord = new Coordinate(wallX, probe + 1);
+                    answer.add(originCoord);
+                    answer.add(destinationCoord);
+                    return answer;
+                }
             }
-            world[connectorX + 1][aYCoord + aLength] = Tileset.MOUNTAIN;
-            world[connectorX + 1][aYCoord + aLength - 1] = Tileset.MOUNTAIN;
         }
-        if (bXCoord + bWidth < aXCoord) {
-            int distBetween = aXCoord - (bXCoord + bWidth);
-            int connectorY = java.lang.Math.max(bYCoord, aYCoord);
-            bigWorld.buildRoom((bXCoord + bWidth), (connectorY), world, 3, (distBetween + 2));
-            for (int i = aXCoord + 1; i < aXCoord + aWidth - 1; i++) {
-                world[i][connectorY + 1] = Tileset.MOUNTAIN;
-                world[i][connectorY + 2] = Tileset.MOUNTAIN;
+        return null;
+    }
+    public static void hallwayMakerRight(TETile[][] world){
+        for(Room origin : roomTracker){
+            if(hallwayFinderRight(origin, world) == null){
+                continue;
             }
-            world[bXCoord + bWidth][connectorY + 1] = Tileset.MOUNTAIN;
-            world[bXCoord + bWidth - 1][connectorY + 1] = Tileset.MOUNTAIN;
+            else{
+                ArrayList coords = hallwayFinderRight(origin, world);
+                hallway.connectRight(coords, world);
+            }
         }
-        if (aYCoord > bYCoord + bLength) {
-            int distBetween = aYCoord - (bYCoord + bLength);
-            int connectorX = java.lang.Math.max(bXCoord, aXCoord);
-            bigWorld.buildRoom((connectorX), (bYCoord + bLength), world, distBetween + 2, 3);
-            for (int i = aYCoord + 1; i < aYCoord + aLength - 1; i++) {
-                world[connectorX + 1][i] = Tileset.MOUNTAIN;
+    }
+    public static void hallwayMakerUp(TETile[][] world){
+        for(Room origin : roomTracker){
+            if(hallwayFinderUp(origin, world) == null){
+                continue;
             }
-            world[connectorX + 1][bYCoord + bLength] = Tileset.MOUNTAIN;
-            world[connectorX + 1][bYCoord + bLength - 1] = Tileset.MOUNTAIN;
+            else{
+                ArrayList coords = hallwayFinderUp(origin, world);
+                hallway.connectUp(coords, world);
+            }
         }
     }
 
     public static Boolean noOverlap(Room a) {
         for (Room i : roomTracker) {
             int left = i.x;
-            int right = i.x + i.width -1;
+            int right = i.x + i.width - 1;
             int bottom = i.y;
             int top = i.y + i.length - 1;
             /** upper right */
-            if ( a.x <= right && a.y <= top && a.y + a.length - 1  >= top && a.y >= bottom){
+            if (a.x <= right && a.y <= top && a.y + a.length - 1 >= top && a.y >= bottom) {
                 return false;
             }
             /** mid right */
-            else if (a.x <= right && a.y <= top && a.length - 1  <= top && a.y >= bottom){
+            else if (a.x <= right && a.y <= top && a.length - 1 <= top && a.y >= bottom) {
                 return false;
             }
             /** bottom right */
-            else if (a.x <= right && a.y <= bottom && a.y + a.length - 1 >= bottom && a.y + a.length - 1 <= top){
+            else if (a.x <= right && a.y <= bottom && a.y + a.length - 1 >= bottom && a.y + a.length - 1 <= top) {
                 return false;
             }
             /** bottom mid */
-            else if(a.y <= bottom && a.x >= left && a.x + a.width - 1 <= right && a.y + a.length - 1 >= bottom && a.y + a.length - 1 <= top){
+            else if (a.y <= bottom && a.x >= left && a.x + a.width - 1 <= right && a.y + a.length - 1 >= bottom && a.y + a.length - 1 <= top) {
                 return false;
             }
             /** bottom left */
-            else if(a.x <= left && a.y <= bottom && a.x + a.width - 1 >= left && a.y + a.length - 1 >= bottom){
+            else if (a.x <= left && a.y <= bottom && a.x + a.width - 1 >= left && a.y + a.length - 1 >= bottom) {
                 return false;
             }
             /** mid left */
-            else if(a.x <= left && a.x + a.width - 1 >= left && a.y >= bottom && a.y + a.length -1 <= top){
+            else if (a.x <= left && a.x + a.width - 1 >= left && a.y >= bottom && a.y + a.length - 1 <= top) {
                 return false;
             }
             /** upper left */
-            else if(a.x <= left && a.x + a.width - 1 >= left && a.y <= top && a.y + a.length - 1 >= top){
+            else if (a.x <= left && a.x + a.width - 1 >= left && a.y <= top && a.y + a.length - 1 >= top) {
                 return false;
             }
             /** upper mid */
-            else if(a.x >= left && a.x + a.width - 1 <= right && a.y <= top && a.y + a.length - 1 >= top){
+            else if (a.x >= left && a.x + a.width - 1 <= right && a.y <= top && a.y + a.length - 1 >= top) {
                 return false;
             }
         }
         return true;
     }
-    public static void roomTrackerAdder(Room room){
+
+    public static void roomTrackerAdder(Room room) {
         roomTracker.add(room);
     }
-
-    public void mutateRoom() {
-        //shrinks room if it overlaps
-    }
-
-
 }
+
 

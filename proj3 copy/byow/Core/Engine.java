@@ -6,6 +6,8 @@ import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 import byow.Core.Room;
 
+import static byow.TileEngine.Tileset.SAND;
+
 public class Engine {
     TERenderer ter = new TERenderer();
     /* Feel free to change the width and height. */
@@ -61,7 +63,7 @@ public class Engine {
         Long seed = Long.valueOf(input.substring(1, input.length() - 1));
         Random rnd = new Random();
         rnd.setSeed(seed);
-        int numRooms = rnd.nextInt(50);
+        int numRooms = rnd.nextInt(2000);
         int prevXCoord = 0;
         int prevYCoord = 0;
         int prevLength = 0;
@@ -78,24 +80,15 @@ public class Engine {
                     length = rnd.nextInt(10);
                 }
             }
-            Room roomCurr = new Room(xCoord, yCoord, width, length);
+            Room roomCurr = new Room(xCoord, yCoord, length, width);
             if (Room.noOverlap(roomCurr)) {
                 bigWorld.buildRoom(xCoord, yCoord, world, length, width);
-                if (i != 0) {
-                    Room.connect(roomPrev, roomCurr, world);
-                }
                 Room.roomTrackerAdder(roomCurr);
-                prevXCoord = xCoord;
-                prevYCoord = yCoord;
-                prevLength = length;
-                prevWidth = width;
-
             }
-
         }
-
-
-//        TETile[][] finalWorldFrame = null;
+        Room.hallwayMakerRight(world);
+        Room.hallwayMakerUp(world);
+        bigWorld.worldAdjust(world);
         return world;
     }
 }
