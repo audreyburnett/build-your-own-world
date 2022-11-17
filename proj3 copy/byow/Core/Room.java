@@ -75,21 +75,43 @@ public class Room {
     public static Boolean overlap(Room a) {
         for (Room i : roomTracker) {
             int left = i.x;
-            int right = i.x + i.width - 1;
+            int right = i.x + i.width -1;
             int bottom = i.y;
             int top = i.y + i.length - 1;
-            if (a.x >= left && a.x <= right - 1 && a.y <= top - 1 && a.y >= bottom) {
-                return true;
-            } else if (a.x + a.width - 1 >= left && a.x + a.width - 1 <= right && a.y <= top && a.y >= bottom) {
-                return true;
-            } else if (a.x  >= left && a.x <= right && a.y + a.length - 1 <= top && a.y + a.length - 1 >= bottom) {
-                return true;
-            } else if (a.x + a.width - 1 >= left && a.x + a.width - 1 <= right && a.y + a.length - 1 <= top && a.y + a.length - 1 >= bottom) {
-                return true;
+            /** upper right */
+            if ( a.x <= right && a.y <= top && a.y + a.length - 1  >= top && a.y >= bottom){
+                return false;
+            }
+            /** mid right */
+            else if (a.x <= right && a.y <= top && a.length - 1  <= top && a.y >= bottom){
+                return false;
+            }
+            /** bottom right */
+            else if (a.x <= right && a.y <= bottom && a.y + a.length - 1 >= bottom && a.y + a.length - 1 <= top){
+                return false;
+            }
+            /** bottom mid */
+            else if(a.y <= bottom && a.x >= left && a.x + a.width - 1 <= right && a.y + a.length - 1 >= bottom && a.y + a.length - 1 <= top){
+                return false;
+            }
+            /** bottom left */
+            else if(a.x <= left && a.y <= bottom && a.x + a.width - 1 >= left && a.y + a.length - 1 >= bottom){
+                return false;
+            }
+            /** mid left */
+            else if(a.x <= left && a.x + a.width - 1 >= left && a.y >= bottom && a.y + a.length -1 <= top){
+                return false;
+            }
+            /** upper left */
+            else if(a.x <= left && a.x + a.width - 1 >= left && a.y <= top && a.y + a.length - 1 >= top){
+                return false;
+            }
+            /** upper mid */
+            else if(a.x >= left && a.x + a.width - 1 <= right && a.y <= top && a.y + a.length - 1 >= top){
+                return false;
             }
         }
-        return false;
-
+        return true;
     }
     public static void roomTrackerAdder(Room room){
         roomTracker.add(room);
