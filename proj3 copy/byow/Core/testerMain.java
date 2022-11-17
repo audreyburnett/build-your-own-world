@@ -32,7 +32,7 @@ public class testerMain {
         Room roomD = new Room(24,6, 5, 3);
         bigWorld.buildRoom(3, 5, world, 4, 3);
         Room.roomTrackerAdder(roomC);
-        if(Room.noOverlap(roomD)) {
+        if (!(Room.noOverlap(roomD))) {
             bigWorld.buildRoom(24, 6, world, 5, 3);
         }
 
