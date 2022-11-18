@@ -89,6 +89,8 @@ public class Engine {
         Room.hallwayMakerRight(world);
         Room.hallwayMakerUp(world);
         bigWorld.worldAdjust(world);
+        Coordinate coord = Room.doorFinder(world);
+        bigWorld.doorBuilder(world, coord);
         return world;
     }
 }

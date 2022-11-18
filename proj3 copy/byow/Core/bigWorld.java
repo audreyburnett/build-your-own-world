@@ -59,4 +59,9 @@ public class bigWorld {
             }
         }
     }
+    public static void doorBuilder(TETile[][] world, Coordinate coord){
+        int x = coord.x;
+        int y = coord.y;
+        world[x][y] = Tileset.LOCKED_DOOR;
+    }
 }
