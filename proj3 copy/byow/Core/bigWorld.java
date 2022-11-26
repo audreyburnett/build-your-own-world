@@ -1,11 +1,14 @@
 package byow.Core;
-
+import java.util.ArrayList;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 import byow.Core.RandomUtils;
 import java.lang.Math;
+import java.util.HashMap;
+import java.util.Random;
 
 public class bigWorld {
+    public static HashMap<String, Coordinate> avatarTracker= new HashMap<>();
     public static void buildRoom(int x, int y, TETile[][] world, int length, int width){
         for(int start = x; start < x + width; start ++){
             world[start][y] = Tileset.SAND;
@@ -24,9 +27,6 @@ public class bigWorld {
         }
     }
 
-    public static void buildHallway(int x, int y, TETile[][] world, int length, int width){
-        buildRoom(x, y, world, length, width);
-    }
     public static void worldAdjust(TETile[][] world){
         for( int x = 1; x < 79; x ++){
             for(int y = 1; y < 29; y++){
@@ -59,9 +59,72 @@ public class bigWorld {
             }
         }
     }
-    public static void doorBuilder(TETile[][] world, Coordinate coord){
-        int x = coord.x;
-        int y = coord.y;
-        world[x][y] = Tileset.LOCKED_DOOR;
+    public static Boolean movementCheckerUp(TETile[][] world){
+        Coordinate current = avatarTracker.get("avatar");
+        if(world[current.x][current.y + 1] == Tileset.MOUNTAIN){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    public static Boolean movementCheckerRight( TETile[][] world){
+        Coordinate current = avatarTracker.get("avatar");
+        if(world[current.x + 1][current.y] == Tileset.MOUNTAIN){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    public static Boolean movementCheckerDown(TETile[][] world){
+        Coordinate current = avatarTracker.get("avatar");
+        if(world[current.x][current.y - 1] == Tileset.MOUNTAIN){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    public static Boolean movementCheckerLeft(TETile[][] world){
+        Coordinate current = avatarTracker.get("avatar");
+        if(world[current.x - 1][current.y] == Tileset.MOUNTAIN){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    public static void avatarUp(TETile[][] world){
+        Coordinate current = avatarTracker.get("avatar");
+        world[current.x][current.y+1] = Tileset.AVATAR;
+        world[current.x][current.y] = Tileset.MOUNTAIN;
+        Coordinate up = new Coordinate(current.x, current.y+1);
+        avatarTracker.put("avatar", up);
+    }
+    public static void avatarRight(TETile[][] world){
+        Coordinate current = avatarTracker.get("avatar");
+        world[current.x+1][current.y] = Tileset.AVATAR;
+        world[current.x][current.y] = Tileset.MOUNTAIN;
+        Coordinate right = new Coordinate(current.x+1, current.y);
+        avatarTracker.put("avatar", right);
+    }
+    public static void avatarDown(TETile[][] world){
+        Coordinate current = avatarTracker.get("avatar");
+        world[current.x][current.y-1] = Tileset.AVATAR;
+        world[current.x][current.y] = Tileset.MOUNTAIN;
+        Coordinate down = new Coordinate(current.x, current.y-1);
+        avatarTracker.put("avatar", down);
+    }
+    public static void avatarLeft( TETile[][] world){
+        Coordinate current = avatarTracker.get("avatar");
+        world[current.x-1][current.y] = Tileset.AVATAR;
+        world[current.x][current.y] = Tileset.MOUNTAIN;
+        Coordinate left = new Coordinate(current.x-1, current.y);
+        avatarTracker.put("avatar", left);
+    }
+    public static void avTrackerAdder(int x, int y){
+        Coordinate av = new Coordinate(x,y);
+        avatarTracker.put("avatar", av);
     }
 }

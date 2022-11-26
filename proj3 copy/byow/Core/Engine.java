@@ -1,12 +1,11 @@
 package byow.Core;
+import java.awt.*;
 import java.util.Random;
-
+import java.util.*;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
-import byow.Core.Room;
-
-import static byow.TileEngine.Tileset.SAND;
+import edu.princeton.cs.algs4.StdDraw;
 
 public class Engine {
     TERenderer ter = new TERenderer();
@@ -19,6 +18,8 @@ public class Engine {
      * including inputs from the main menu.
      */
     public void interactWithKeyboard() {
+        drawing canvas = new drawing(ter, 80, 30, 0, 0);
+        canvas.start(ter);
     }
 
     /**
@@ -60,9 +61,21 @@ public class Engine {
                 world[x][y] = Tileset.WATER;
             }
         }
-        Long seed = Long.valueOf(input.substring(1, input.length() - 1));
+        //Long seed = Long.valueOf(input.substring(1, input.length() - 1));
+        ArrayList seedSplit = new ArrayList();
+        for(char ch : input.toCharArray()){
+            seedSplit.add(ch);
+        }
+        String seed = "";
+        int j = 1;
+        while(!seedSplit.get(j).equals('s')){
+            seed += seedSplit.get(j);
+            j ++;
+        }
+        int letters = j + 1;
+        Long longSeed = Long.valueOf(seed);
         Random rnd = new Random();
-        rnd.setSeed(seed);
+        rnd.setSeed(longSeed);
         int numRooms = rnd.nextInt(2000);
         int prevXCoord = 0;
         int prevYCoord = 0;
@@ -89,8 +102,24 @@ public class Engine {
         Room.hallwayMakerRight(world);
         Room.hallwayMakerUp(world);
         bigWorld.worldAdjust(world);
-        Coordinate coord = Room.doorFinder(world);
-        bigWorld.doorBuilder(world, coord);
+        int xDoor = rnd.nextInt(80);
+        int yDoor = rnd.nextInt(30);
+        int xAv = rnd.nextInt(80);
+        int yAv = rnd.nextInt(30);
+        while(world[xDoor][yDoor] != Tileset.SAND){
+            xDoor = rnd.nextInt(80);
+            yDoor = rnd.nextInt(30);
+        }
+        world[xDoor][yDoor] = Tileset.LOCKED_DOOR;
+        while(world[xAv][yAv] != Tileset.MOUNTAIN){
+            xAv = rnd.nextInt(80);
+            yAv = rnd.nextInt(30);
+        }
+        world[xAv][yAv] = Tileset.AVATAR;
+        bigWorld.avTrackerAdder(xAv, yAv);
+        for(int h = letters; h < seedSplit.size(); h++){
+            movement.move(String.valueOf(seedSplit.get(h)), world);
+        }
         return world;
     }
 }

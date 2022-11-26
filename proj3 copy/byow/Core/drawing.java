@@ -1,0 +1,226 @@
+package byow.Core;
+import byow.TileEngine.Tileset;
+import edu.princeton.cs.algs4.StdDraw;
+import java.awt.Color;
+import java.awt.Font;
+import java.util.Random;
+import byow.TileEngine.TERenderer;
+import byow.TileEngine.TETile;
+
+public class drawing {
+    private final int yOff;
+    /** The width of the window of this game. */
+    private int width;
+    /** The height of the window of this game. */
+    private int height;
+    private final int xOff;
+    /** The current round the user is on. */
+    private int round;
+    /** The Random object used to randomly generate Strings. */
+    private Random rand;
+    /** Whether or not the game is over. */
+    private boolean gameOver;
+    public drawing(TERenderer ter, int width, int height, int xOff, int yOff) {
+        /* Sets up StdDraw so that it has a width by height grid of 16 by 16 squares as its canvas
+         * Also sets up the scale so the top left is (0,0) and the bottom right is (width, height)
+         */
+        ter.initialize(width, height, 0, 0 );
+        this.width = width;
+        this.height = height;
+        this.xOff = xOff;
+        this.yOff = yOff;
+    }
+    public void map(TETile[][] world, TERenderer ter){
+        ter.renderFrame(world);
+    }
+    public void mainMenu(){
+        StdDraw.clear(Color.BLACK);
+        StdDraw.setPenColor(Color.WHITE);
+        Font fontBig = new Font("Monaco", Font.BOLD, 30);
+        StdDraw.setFont(fontBig);
+        StdDraw.text(width / 2, 25, "BEGIN YOUR JOURNEY...");
+        Font fontSmall = new Font("Monaco", Font.BOLD, 30);
+        StdDraw.setFont(fontSmall);
+        StdDraw.text(width / 2, 17, "New Game (N)");
+        StdDraw.text(width / 2, 15, "Load Game (L)");
+        StdDraw.text(width / 2, 13, "Quit (Q)");
+        StdDraw.show();
+        StdDraw.pause(10);
+    }
+    public void start(TERenderer ter){
+        Boolean Typed = false;
+        mainMenu();
+        while (!Typed){
+            if(menuNInput()){
+                seedPrompt();
+                Typed = true;
+            }
+            if(menuQInput()){
+                break;
+            }
+        }
+//        showStringInput();
+        String answer = seedInput();
+        drawFrame(answer);
+        TETile [][] world = worldBuilder(answer);
+        ter.renderFrame(world);
+        playerMoves(world, ter);
+    }
+    public Boolean menuNInput() {
+        if (StdDraw.hasNextKeyTyped()) {
+            char typed = StdDraw.nextKeyTyped();
+            if (typed == 'N') {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+    public Boolean menuQInput() {
+        if (StdDraw.hasNextKeyTyped()) {
+            char typed = StdDraw.nextKeyTyped();
+            if (typed == 'Q') {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+    public void playerMoves(TETile [][] world, TERenderer ter){
+        while(true){
+            if(StdDraw.hasNextKeyTyped()){
+                char typed = StdDraw.nextKeyTyped();
+                String stringTyped = String.valueOf(typed);
+                movement.move(stringTyped, world);
+                ter.renderFrame(world);
+            }
+        }
+    }
+    public void seedPrompt(){
+        StdDraw.clear(Color.BLACK);
+        StdDraw.setPenColor(Color.WHITE);
+        Font fontBig = new Font("Monaco", Font.BOLD, 30);
+        StdDraw.setFont(fontBig);
+        StdDraw.text(width / 2, 16, "PLEASE ENTER A SEED FOLLOWED BY S");
+        StdDraw.show();
+        StdDraw.pause(50);
+    }
+    public String seedInput(){
+        String answer = "";
+        Boolean sTyped = false;
+        while(!sTyped) {
+            if (StdDraw.hasNextKeyTyped()) {
+                char typed = StdDraw.nextKeyTyped();
+                answer += (typed);
+                drawFrame(String.valueOf(typed));
+                if(typed == 'S') {
+                    sTyped = true;
+                }
+            }
+        }
+        return answer;
+    }
+    public void showStringInput(){
+        Boolean sTyped = false;
+        while(!sTyped) {
+            if (StdDraw.hasNextKeyTyped()) {
+                char typed = StdDraw.nextKeyTyped();
+                String s = String.valueOf(typed);
+                drawFrame(s);
+                if(typed == 'S') {
+                    sTyped = true;
+                }
+            }
+        }
+    }
+    public String seed(){
+        String answer = "";
+        while(StdDraw.hasNextKeyTyped()) {
+            char typed = StdDraw.nextKeyTyped();
+            answer += typed;
+        }
+        String real = (answer.substring(0, answer.length() - 1));
+        return real;
+    }
+    public void drawFrame(String s){
+        StdDraw.clear(Color.BLACK);
+        StdDraw.setPenColor(Color.WHITE);
+        Font fontBig = new Font("Monaco", Font.BOLD, 30);
+        StdDraw.setFont(fontBig);
+        StdDraw.text(this.width / 2, this.height / 2, s);
+        StdDraw.show();
+        StdDraw.pause(100);
+    }
+    public TETile[][] worldBuilder(String seed){
+        TETile[][] world = new TETile[width][height];
+        for (int x = 0; x < width; x += 1) {
+            for (int y = 0; y < height; y += 1) {
+                world[x][y] = Tileset.WATER;
+            }
+        }
+        String s = (seed.substring(0, seed.length() - 1));
+        Random rnd = new Random();
+        Long longSeed = Long.valueOf(s);
+        rnd.setSeed(longSeed);
+        int numRooms = rnd.nextInt(2000);
+        int prevXCoord = 0;
+        int prevYCoord = 0;
+        int prevLength = 0;
+        int prevWidth = 0;
+        for(int i = 0; i < numRooms; i ++) {
+            Room roomPrev = new Room(prevXCoord, prevYCoord, prevLength, prevWidth);
+            int xCoord = rnd.nextInt(70);
+            int yCoord = rnd.nextInt(20);
+            int width = rnd.nextInt(10);
+            int length = rnd.nextInt(10);
+            if (width < 3 || length < 3) {
+                while (width < 3 || length < 3) {
+                    width = rnd.nextInt(10);
+                    length = rnd.nextInt(10);
+                }
+            }
+            Room roomCurr = new Room(xCoord, yCoord, length, width);
+            if (Room.noOverlap(roomCurr)) {
+                bigWorld.buildRoom(xCoord, yCoord, world, length, width);
+                Room.roomTrackerAdder(roomCurr);
+            }
+        }
+        Room.hallwayMakerRight(world);
+        Room.hallwayMakerUp(world);
+        bigWorld.worldAdjust(world);
+        int xDoor = rnd.nextInt(80);
+        int yDoor = rnd.nextInt(30);
+        int xAv = rnd.nextInt(80);
+        int yAv = rnd.nextInt(30);
+        while(world[xDoor][yDoor] != Tileset.SAND){
+            xDoor = rnd.nextInt(80);
+            yDoor = rnd.nextInt(30);
+        }
+        world[xDoor][yDoor] = Tileset.LOCKED_DOOR;
+        while(world[xAv][yAv] != Tileset.MOUNTAIN){
+            xAv = rnd.nextInt(80);
+            yAv = rnd.nextInt(30);
+        }
+        world[xAv][yAv] = Tileset.AVATAR;
+        bigWorld.avTrackerAdder(xAv, yAv);
+        return world;
+    }
+    public void loadScreen(){
+        StdDraw.clear(Color.BLACK);
+        StdDraw.setPenColor(Color.WHITE);
+        Font fontBig = new Font("Monaco", Font.BOLD, 30);
+        StdDraw.setFont(fontBig);
+        StdDraw.text(this.width / 2, 25, "BEGIN YOUR JOURNEY...");
+        Font fontSmall = new Font("Monaco", Font.BOLD, 30);
+        StdDraw.setFont(fontSmall);
+        StdDraw.text(this.width / 2, 17, "New Game (N)");
+        StdDraw.text(this.width / 2, 15, "Load Game (L)");
+        StdDraw.text(this.width / 2, 13, "Quit (Q)");
+        StdDraw.show();
+        StdDraw.pause(1000000000);
+    }
+}
