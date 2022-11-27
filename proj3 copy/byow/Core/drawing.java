@@ -59,12 +59,23 @@ public class drawing {
                 break;
             }
         }
-//        showStringInput();
         String answer = seedInput();
         drawFrame(answer);
         TETile [][] world = worldBuilder(answer);
         ter.renderFrame(world);
-        playerMoves(world, ter);
+        while (true) {
+            playerMoves(world, ter);
+            double x = StdDraw.mouseX();
+            double y = StdDraw.mouseY();
+            mousePos(x, y, world, ter);
+        }
+    }
+    public void hudFrame(String s){
+        StdDraw.setPenColor(Color.WHITE);
+        Font fontBig = new Font("Monaco", Font.BOLD, 15);
+        StdDraw.setFont(fontBig);
+        StdDraw.text(10, this.height - 2, s);
+        StdDraw.show();
     }
     public Boolean menuNInput() {
         if (StdDraw.hasNextKeyTyped()) {
@@ -77,6 +88,22 @@ public class drawing {
         } else {
             return false;
         }
+    }
+    public void mousePos(double x, double y, TETile [][] world, TERenderer ter){
+        String s = "";
+        int intX = (int) x;
+        int intY = (int) y;
+        if (world[intX][intY] == Tileset.MOUNTAIN) {
+            s += "Mountain, HOPE YOU CAN CLIMB!";
+        } else if (world[intX][intY] == Tileset.SAND) {
+            s+= "Sand, IT'S HOT!";
+        } else if (world[intX][intY] == Tileset.LOCKED_DOOR) {
+            s+= "LOCKED DOOR, PLEASE UNLOCK!";
+        } else {
+            s+= "WATER, DON'T DROWN!";
+        }
+        hudFrame(s);
+        ter.renderFrame(world);
     }
     public Boolean menuQInput() {
         if (StdDraw.hasNextKeyTyped()) {
@@ -91,13 +118,11 @@ public class drawing {
         }
     }
     public void playerMoves(TETile [][] world, TERenderer ter){
-        while(true){
-            if(StdDraw.hasNextKeyTyped()){
-                char typed = StdDraw.nextKeyTyped();
-                String stringTyped = String.valueOf(typed);
-                movement.move(stringTyped, world);
-                ter.renderFrame(world);
-            }
+        if(StdDraw.hasNextKeyTyped()){
+            char typed = StdDraw.nextKeyTyped();
+            String stringTyped = String.valueOf(typed);
+            movement.move(stringTyped, world);
+            ter.renderFrame(world);
         }
     }
     public void seedPrompt(){
@@ -175,8 +200,8 @@ public class drawing {
             Room roomPrev = new Room(prevXCoord, prevYCoord, prevLength, prevWidth);
             int xCoord = rnd.nextInt(70);
             int yCoord = rnd.nextInt(20);
-            int width = rnd.nextInt(10);
-            int length = rnd.nextInt(10);
+            int width = rnd.nextInt(6);
+            int length = rnd.nextInt(6);
             if (width < 3 || length < 3) {
                 while (width < 3 || length < 3) {
                     width = rnd.nextInt(10);
