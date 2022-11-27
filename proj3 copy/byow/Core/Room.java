@@ -132,17 +132,6 @@ public class Room {
     public static void roomTrackerAdder(Room room) {
         roomTracker.add(room);
     }
-    public static Coordinate doorFinder(TETile [][] world){
-        ArrayList lah = new ArrayList();
-        for(Room i : roomTracker) {
-            lah.add(i);
-        }
-        Room i = (Room) lah.get(0);
-        int x = i.x;
-        int y = i.y + 1;
-        Coordinate answer = new Coordinate(x, y);
-        return answer;
-    }
 }
 
 
