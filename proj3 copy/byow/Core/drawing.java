@@ -44,30 +44,86 @@ public class drawing {
         StdDraw.text(width / 2, 17, "New Game (N)");
         StdDraw.text(width / 2, 15, "Load Game (L)");
         StdDraw.text(width / 2, 13, "Quit (Q)");
+        StdDraw.text(width / 2, 10, "Character (C)");
         StdDraw.show();
         StdDraw.pause(10);
+    }
+    public void charSelect(){
+        StdDraw.clear(Color.BLACK);
+        StdDraw.setPenColor(Color.WHITE);
+        Font fontBig = new Font("Monaco", Font.BOLD, 30);
+        StdDraw.setFont(fontBig);
+        StdDraw.text(width / 2, 17, "@ (@)");
+        StdDraw.text(width / 2, 15, "Tree (T)");
+        StdDraw.text(width / 2, 13, "Flower (F)");
+        StdDraw.text(width / 2, 10, "Grass (G)");
+        StdDraw.show();
+        StdDraw.pause(2000);
+    }
+    public String selected(){
+        String answer = "";
+        if (StdDraw.hasNextKeyTyped()) {
+            char typed = StdDraw.nextKeyTyped();
+            if (typed == 'T') {
+                return "T";
+            }
+            if (typed == 'F'){
+                return "F";
+            }
+            else{
+                return "G";
+            }
+        }
+        return "a";
     }
     public void start(TERenderer ter){
         Boolean Typed = false;
         mainMenu();
+        String avatar = "";
         while (!Typed){
             if(menuNInput()){
                 seedPrompt();
                 Typed = true;
             }
-            if(menuQInput()){
-                break;
+            if(cInput()){
+                charSelect();
+                avatar = selected();
+                mainMenu();
+                continue;
             }
         }
         String answer = seedInput();
         drawFrame(answer);
-        TETile [][] world = worldBuilder(answer);
+        TETile [][] world = worldBuilder(answer, avatar);
         ter.renderFrame(world);
         while (true) {
-            playerMoves(world, ter);
+            if (avatar == "a") {
+                playerMoves(world, ter);
+            }
+            if (avatar == "F") {
+                FplayerMoves(world, ter);
+            }
+            if (avatar == "T") {
+                TplayerMoves(world, ter);
+            }
+            if (avatar == "G") {
+                GplayerMoves(world, ter);
+            }
             double x = StdDraw.mouseX();
             double y = StdDraw.mouseY();
             mousePos(x, y, world, ter);
+        }
+    }
+    public Boolean cInput(){
+        if (StdDraw.hasNextKeyTyped()) {
+            char typed = StdDraw.nextKeyTyped();
+            if (typed == 'C') {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
         }
     }
     public void hudFrame(String s){
@@ -121,10 +177,47 @@ public class drawing {
         if(StdDraw.hasNextKeyTyped()){
             char typed = StdDraw.nextKeyTyped();
             String stringTyped = String.valueOf(typed);
+//                if (stringTyped == ":Q") {
+//                    break;
+//                }
             movement.move(stringTyped, world);
             ter.renderFrame(world);
         }
     }
+    public void TplayerMoves(TETile [][] world, TERenderer ter){
+        if(StdDraw.hasNextKeyTyped()){
+            char typed = StdDraw.nextKeyTyped();
+            String stringTyped = String.valueOf(typed);
+//                if (stringTyped == ":Q") {
+//                    break;
+//                }
+            movement.Tmove(stringTyped, world);
+            ter.renderFrame(world);
+        }
+    }
+    public void GplayerMoves(TETile [][] world, TERenderer ter){
+        if(StdDraw.hasNextKeyTyped()){
+            char typed = StdDraw.nextKeyTyped();
+            String stringTyped = String.valueOf(typed);
+//                if (stringTyped == ":Q") {
+//                    break;
+//                }
+            movement.Gmove(stringTyped, world);
+            ter.renderFrame(world);
+        }
+    }
+    public void FplayerMoves(TETile [][] world, TERenderer ter){
+        if(StdDraw.hasNextKeyTyped()){
+            char typed = StdDraw.nextKeyTyped();
+            String stringTyped = String.valueOf(typed);
+//                if (stringTyped == ":Q") {
+//                    break;
+//                }
+            movement.Fmove(stringTyped, world);
+            ter.renderFrame(world);
+        }
+    }
+
     public void seedPrompt(){
         StdDraw.clear(Color.BLACK);
         StdDraw.setPenColor(Color.WHITE);
@@ -149,28 +242,6 @@ public class drawing {
         }
         return answer;
     }
-    public void showStringInput(){
-        Boolean sTyped = false;
-        while(!sTyped) {
-            if (StdDraw.hasNextKeyTyped()) {
-                char typed = StdDraw.nextKeyTyped();
-                String s = String.valueOf(typed);
-                drawFrame(s);
-                if(typed == 'S') {
-                    sTyped = true;
-                }
-            }
-        }
-    }
-    public String seed(){
-        String answer = "";
-        while(StdDraw.hasNextKeyTyped()) {
-            char typed = StdDraw.nextKeyTyped();
-            answer += typed;
-        }
-        String real = (answer.substring(0, answer.length() - 1));
-        return real;
-    }
     public void drawFrame(String s){
         StdDraw.clear(Color.BLACK);
         StdDraw.setPenColor(Color.WHITE);
@@ -180,7 +251,7 @@ public class drawing {
         StdDraw.show();
         StdDraw.pause(100);
     }
-    public TETile[][] worldBuilder(String seed){
+    public TETile[][] worldBuilder(String seed, String avatar){
         TETile[][] world = new TETile[width][height];
         for (int x = 0; x < width; x += 1) {
             for (int y = 0; y < height; y += 1) {
@@ -230,22 +301,19 @@ public class drawing {
             xAv = rnd.nextInt(80);
             yAv = rnd.nextInt(30);
         }
-        world[xAv][yAv] = Tileset.AVATAR;
+        if (avatar.equals("a")) {
+            world[xAv][yAv] = Tileset.AVATAR;
+        }
+        if (avatar.equals("T")) {
+            world[xAv][yAv] = Tileset.TREE;
+        }
+        if (avatar.equals("F")){
+            world[xAv][yAv] = Tileset.FLOWER;
+        }
+        if (avatar.equals("G")) {
+            world[xAv][yAv] = Tileset.GRASS;
+        }
         bigWorld.avTrackerAdder(xAv, yAv);
         return world;
-    }
-    public void loadScreen(){
-        StdDraw.clear(Color.BLACK);
-        StdDraw.setPenColor(Color.WHITE);
-        Font fontBig = new Font("Monaco", Font.BOLD, 30);
-        StdDraw.setFont(fontBig);
-        StdDraw.text(this.width / 2, 25, "BEGIN YOUR JOURNEY...");
-        Font fontSmall = new Font("Monaco", Font.BOLD, 30);
-        StdDraw.setFont(fontSmall);
-        StdDraw.text(this.width / 2, 17, "New Game (N)");
-        StdDraw.text(this.width / 2, 15, "Load Game (L)");
-        StdDraw.text(this.width / 2, 13, "Quit (Q)");
-        StdDraw.show();
-        StdDraw.pause(1000000000);
     }
 }
