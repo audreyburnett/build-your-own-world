@@ -60,6 +60,7 @@ public class drawing {
         Boolean Q = false;
         String moves = "";
         mainMenu();
+        String avatar = "a";
         while (!Q) {
             if (StdDraw.hasNextKeyTyped()) {
                 char typed = StdDraw.nextKeyTyped();
@@ -77,7 +78,7 @@ public class drawing {
                 }
                 if (typed == 'C' || typed == 'c') {
                     charSelect();
-                    String avatar = selected();
+                    avatar = selected();
                     mainMenu();
                     continue;
 
@@ -86,9 +87,18 @@ public class drawing {
                     seedPrompt();
                     answer = seedInput();
                     drawFrame(answer);
-                    TETile[][] world = worldBuilder(answer);
+                    TETile[][] world = worldBuilder(answer, avatar);
                     ter.renderFrame(world);
                     while (true) {
+                        double priorX = 0.0;
+                        double priorY = 0.0;
+                        double x = StdDraw.mouseX();
+                        double y = StdDraw.mouseY();
+                        while (x != priorX && y != priorY) {
+                            mousePos(x, y, world, ter);
+                            priorX = x;
+                            priorY = y;
+                        }
                         if (StdDraw.hasNextKeyTyped()) {
                             typed = StdDraw.nextKeyTyped();
                             if (typed == ':') {
@@ -108,18 +118,35 @@ public class drawing {
                                 if (typed == 'w' || typed == 'a' || typed == 's' || typed == 'd') {
                                     moves += typed;
                                 }
-                                movement.move(String.valueOf(typed), world, ter);
-                                double x = StdDraw.mouseX();
-                                double y = StdDraw.mouseY();
-                                mousePos(x, y, world, ter);
+                                if (avatar.equals("a")) {
+                                    movement.move(String.valueOf(typed), world, ter);
+                                }
+                                if (avatar.equals("T")) {
+                                    movement.Tmove(String.valueOf(typed), world, ter);
+                                }
+                                if (avatar.equals("F")){
+                                    movement.Fmove(String.valueOf(typed), world, ter);
+                                }
+                                if (avatar.equals("G")) {
+                                    movement.Gmove(String.valueOf(typed), world, ter);
+                                }
                             }
                         }
                     }
                 }
                 if (typed == 'L' || typed == 'l') {
-                    TETile[][] world = load(filename.getName(), ter);
+                    TETile[][] world = load(filename.getName(), ter, avatar);
                     ter.renderFrame(world);
                     while (true) {
+                        double priorX = 0.0;
+                        double priorY = 0.0;
+                        double x = StdDraw.mouseX();
+                        double y = StdDraw.mouseY();
+                        while (x != priorX && y != priorY) {
+                            mousePos(x, y, world, ter);
+                            priorX = x;
+                            priorY = y;
+                        }
                         if (StdDraw.hasNextKeyTyped()) {
                             typed = StdDraw.nextKeyTyped();
                             if (typed == ':') {
@@ -140,15 +167,12 @@ public class drawing {
                                     moves += typed;
                                 }
                                 movement.move(String.valueOf(typed), world, ter);
-                                double x = StdDraw.mouseX();
-                                double y = StdDraw.mouseY();
-                                mousePos(x, y, world, ter);
                             }
                         }
                     }
                 }
                 if (typed == 'R' || typed == 'r') {
-                    TETile[][] world = load(filename.getName(), ter);
+                    TETile[][] world = load(filename.getName(), ter, avatar);
                     ter.renderFrame(world);
                     while (true) {
                         if (StdDraw.hasNextKeyTyped()) {
@@ -213,11 +237,11 @@ public class drawing {
         out.println(seed);
         out.println(moves);
     }
-    public TETile[][] load(String filename, TERenderer ter) {
+    public TETile[][] load(String filename, TERenderer ter, String avatar) {
         In in = new In(filename);
         String seed = in.readLine();
         drawFrame(seed);
-        TETile[][] world = worldBuilder(seed);
+        TETile[][] world = worldBuilder(seed, avatar);
         String[] moves = in.readLine().split("");
         for (int i = 0; i < moves.length; i++) {
             movement.move(moves[i], world, ter);
@@ -313,7 +337,7 @@ public class drawing {
         StdDraw.show();
         StdDraw.pause(100);
     }
-    public TETile[][] worldBuilder(String seed){
+    public TETile[][] worldBuilder(String seed, String avatar){
         TETile[][] world = new TETile[width][height];
         for (int x = 0; x < width; x += 1) {
             for (int y = 0; y < height; y += 1) {
@@ -363,7 +387,18 @@ public class drawing {
             xAv = rnd.nextInt(80);
             yAv = rnd.nextInt(30);
         }
-        world[xAv][yAv] = Tileset.AVATAR;
+        if (avatar.equals("a")) {
+            world[xAv][yAv] = Tileset.AVATAR;
+        }
+        if (avatar.equals("T")) {
+            world[xAv][yAv] = Tileset.TREE;
+        }
+        if (avatar.equals("F")){
+            world[xAv][yAv] = Tileset.FLOWER;
+        }
+        if (avatar.equals("G")) {
+            world[xAv][yAv] = Tileset.GRASS;
+        }
         bigWorld.avTrackerAdder(xAv, yAv);
         return world;
     }
