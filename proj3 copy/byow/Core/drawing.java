@@ -1,8 +1,12 @@
 package byow.Core;
 import byow.TileEngine.Tileset;
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.Out;
 import edu.princeton.cs.algs4.StdDraw;
 import java.awt.Color;
 import java.awt.Font;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Random;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
@@ -20,6 +24,9 @@ public class drawing {
     private Random rand;
     /** Whether or not the game is over. */
     private boolean gameOver;
+    private String answer;
+    private Out out;
+    public static File filename = new File("savedWorld.txt");
     public drawing(TERenderer ter, int width, int height, int xOff, int yOff) {
         /* Sets up StdDraw so that it has a width by height grid of 16 by 16 squares as its canvas
          * Also sets up the scale so the top left is (0,0) and the bottom right is (width, height)
@@ -47,29 +54,110 @@ public class drawing {
         StdDraw.show();
         StdDraw.pause(10);
     }
-    public void start(TERenderer ter){
-        Boolean Typed = false;
+    public void start(TERenderer ter) {
+        Boolean Q = false;
+        String moves = "";
         mainMenu();
-        while (!Typed){
-            if(menuNInput()){
-                seedPrompt();
-                Typed = true;
+        while (!Q) {
+            if (StdDraw.hasNextKeyTyped()) {
+                char typed = StdDraw.nextKeyTyped();
+                if (typed == ':') {
+                    while (true) {
+                        if (StdDraw.hasNextKeyTyped()) {
+                            typed = StdDraw.nextKeyTyped();
+                            if (typed == 'Q' | typed == 'q') {
+                                System.exit(0);
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (typed == 'N' || typed == 'n') {
+                    seedPrompt();
+                    answer = seedInput();
+                    drawFrame(answer);
+                    TETile[][] world = worldBuilder(answer);
+                    ter.renderFrame(world);
+                    while (true) {
+                        if (StdDraw.hasNextKeyTyped()) {
+                            typed = StdDraw.nextKeyTyped();
+                            if (typed == ':') {
+                                while (true) {
+                                    if (StdDraw.hasNextKeyTyped()) {
+                                        typed = StdDraw.nextKeyTyped();
+                                        if (typed == 'Q' || typed == 'q') {
+                                            out = new Out(filename.getName());
+                                            save(filename, out, answer, moves);
+                                            System.exit(0);
+                                        } else {
+                                            break;
+                                        }
+                                    }
+                                }
+                            } else {
+                                if (typed == 'w' || typed == 'a' || typed == 's' || typed == 'd') {
+                                    moves += typed;
+                                }
+                                movement.move(String.valueOf(typed), world);
+                                double x = StdDraw.mouseX();
+                                double y = StdDraw.mouseY();
+                                mousePos(x, y, world, ter);
+                            }
+                        }
+                    }
+                }
+                if (typed == 'L' || typed == 'l') {
+                    TETile[][] world = load(filename.getName(), ter);
+                    ter.renderFrame(world);
+                    while (true) {
+                        if (StdDraw.hasNextKeyTyped()) {
+                            typed = StdDraw.nextKeyTyped();
+                            if (typed == ':') {
+                                while (true) {
+                                    if (StdDraw.hasNextKeyTyped()) {
+                                        typed = StdDraw.nextKeyTyped();
+                                        if (typed == 'Q' || typed == 'q') {
+                                            out = new Out(filename.getName());
+                                            save(filename, out, answer, moves);
+                                            System.exit(0);
+                                        } else {
+                                            break;
+                                        }
+                                    }
+                                }
+                            } else {
+                                if (typed == 'w' || typed == 'a' || typed == 's' || typed == 'd') {
+                                    moves += typed;
+                                }
+                                movement.move(String.valueOf(typed), world);
+                                double x = StdDraw.mouseX();
+                                double y = StdDraw.mouseY();
+                                mousePos(x, y, world, ter);
+                            }
+                        }
+                    }
+                }
             }
-            if(menuQInput()){
-                break;
-            }
-        }
-        String answer = seedInput();
-        drawFrame(answer);
-        TETile [][] world = worldBuilder(answer);
-        ter.renderFrame(world);
-        while (true) {
-            playerMoves(world, ter);
-            double x = StdDraw.mouseX();
-            double y = StdDraw.mouseY();
-            mousePos(x, y, world, ter);
         }
     }
+
+    public static void save(File filename, Out out, String seed, String moves) {
+        out.println(seed);
+        out.println(moves);
+    }
+    public TETile[][] load(String filename, TERenderer ter) {
+        In in = new In(filename);
+        String seed = in.readLine();
+        drawFrame(seed);
+        TETile[][] world = worldBuilder(seed);
+        String[] moves = in.readLine().split("");
+        for (int i = 0; i < moves.length; i++) {
+            movement.move(moves[i], world);
+        }
+        return world;
+    }
+
     public void hudFrame(String s){
         StdDraw.setPenColor(Color.WHITE);
         Font fontBig = new Font("Monaco", Font.BOLD, 15);
@@ -77,18 +165,7 @@ public class drawing {
         StdDraw.text(10, this.height - 2, s);
         StdDraw.show();
     }
-    public Boolean menuNInput() {
-        if (StdDraw.hasNextKeyTyped()) {
-            char typed = StdDraw.nextKeyTyped();
-            if (typed == 'N') {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
+
     public void mousePos(double x, double y, TETile [][] world, TERenderer ter){
         String s = "";
         int intX = (int) x;
@@ -105,18 +182,7 @@ public class drawing {
         hudFrame(s);
         ter.renderFrame(world);
     }
-    public Boolean menuQInput() {
-        if (StdDraw.hasNextKeyTyped()) {
-            char typed = StdDraw.nextKeyTyped();
-            if (typed == 'Q') {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
+
     public void playerMoves(TETile [][] world, TERenderer ter){
         if(StdDraw.hasNextKeyTyped()){
             char typed = StdDraw.nextKeyTyped();
@@ -141,8 +207,8 @@ public class drawing {
             if (StdDraw.hasNextKeyTyped()) {
                 char typed = StdDraw.nextKeyTyped();
                 answer += (typed);
-                drawFrame(String.valueOf(typed));
-                if(typed == 'S') {
+                drawFrame(String.valueOf(answer));
+                if(typed == 'S' || typed == 's') {
                     sTyped = true;
                 }
             }
@@ -156,7 +222,7 @@ public class drawing {
                 char typed = StdDraw.nextKeyTyped();
                 String s = String.valueOf(typed);
                 drawFrame(s);
-                if(typed == 'S') {
+                if(typed == 'S' || typed == 's') {
                     sTyped = true;
                 }
             }
