@@ -51,6 +51,8 @@ public class drawing {
         StdDraw.text(width / 2, 17, "New Game (N)");
         StdDraw.text(width / 2, 15, "Load Game (L)");
         StdDraw.text(width / 2, 13, "Quit (Q)");
+        StdDraw.text(width / 2, 11, "Replay (R)");
+        StdDraw.text(width / 2, 9, "Character (C)");
         StdDraw.show();
         StdDraw.pause(10);
     }
@@ -72,6 +74,13 @@ public class drawing {
                             }
                         }
                     }
+                }
+                if (typed == 'C' || typed == 'c') {
+                    charSelect();
+                    String avatar = selected();
+                    mainMenu();
+                    continue;
+
                 }
                 if (typed == 'N' || typed == 'n') {
                     seedPrompt();
@@ -138,8 +147,66 @@ public class drawing {
                         }
                     }
                 }
+                if (typed == 'R' || typed == 'r') {
+                    TETile[][] world = load(filename.getName(), ter);
+                    ter.renderFrame(world);
+                    while (true) {
+                        if (StdDraw.hasNextKeyTyped()) {
+                            typed = StdDraw.nextKeyTyped();
+                            if (typed == ':') {
+                                while (true) {
+                                    if (StdDraw.hasNextKeyTyped()) {
+                                        typed = StdDraw.nextKeyTyped();
+                                        if (typed == 'Q' || typed == 'q') {
+                                            out = new Out(filename.getName());
+                                            save(filename, out, answer, moves);
+                                            System.exit(0);
+                                        } else {
+                                            break;
+                                        }
+                                    }
+                                }
+                            } else {
+                                if (typed == 'w' || typed == 'a' || typed == 's' || typed == 'd') {
+                                    moves += typed;
+                                }
+//                                movement.move(String.valueOf(typed), world, ter);
+                                double x = StdDraw.mouseX();
+                                double y = StdDraw.mouseY();
+                                mousePos(x, y, world, ter);
+                            }
+                        }
+                    }
+                }
             }
         }
+    }
+    public void charSelect(){
+        StdDraw.clear(Color.BLACK);
+        StdDraw.setPenColor(Color.WHITE);
+        Font fontBig = new Font("Monaco", Font.BOLD, 30);
+        StdDraw.setFont(fontBig);
+        StdDraw.text(width / 2, 17, "@ (@)");
+        StdDraw.text(width / 2, 15, "Tree (T)");
+        StdDraw.text(width / 2, 13, "Flower (F)");
+        StdDraw.text(width / 2, 10, "Grass (G)");
+        StdDraw.show();
+        StdDraw.pause(2000);
+    }
+    public String selected() {
+        String answer = "";
+        if (StdDraw.hasNextKeyTyped()) {
+            char typed = StdDraw.nextKeyTyped();
+            if (typed == 'T') {
+                return "T";
+            }
+            if (typed == 'F') {
+                return "F";
+            } else {
+                return "G";
+            }
+        }
+        return "a";
     }
 
     public static void save(File filename, Out out, String seed, String moves) {
