@@ -1,4 +1,5 @@
 package byow.TileEngine;
+import byow.Core.Coordinate;
 
 import edu.princeton.cs.algs4.StdDraw;
 
@@ -94,6 +95,23 @@ public class TERenderer {
                             + " is null.");
                 }
                 world[x][y].draw(x + xOffset, y + yOffset);
+            }
+        }
+        StdDraw.show();
+    }
+    public void renderLightFrame(TETile[][] world, Coordinate avatar){
+        int x = avatar.x;
+        int y = avatar.y;
+        int numXTiles = 6;
+        int numYTiles = 6;
+        StdDraw.clear(new Color(0, 0, 0));
+        for (int start = x - 3; start < numXTiles; start += 1) {
+            for (int yStart = y - 3; yStart < numYTiles; yStart += 1) {
+                if (world[start][yStart] == null) {
+                    throw new IllegalArgumentException("Tile at position x=" + start + ", y=" + yStart
+                            + " is null.");
+                }
+                world[start][yStart].draw(start + xOffset, yStart + yOffset);
             }
         }
         StdDraw.show();

@@ -211,4 +211,8 @@ public class bigWorld {
         Coordinate av = new Coordinate(x,y);
         avatarTracker.put("avatar", av);
     }
+    public static Coordinate avTrackerGetter(){
+        Coordinate coord = avatarTracker.get("avatar");
+        return coord;
+    }
 }

@@ -114,10 +114,34 @@ public class drawing {
             mousePos(x, y, world, ter);
         }
     }
+    public Boolean kPressed(){
+        if (StdDraw.hasNextKeyTyped()) {
+            char typed = StdDraw.nextKeyTyped();
+            if (typed == 'K') {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
     public Boolean cInput(){
         if (StdDraw.hasNextKeyTyped()) {
             char typed = StdDraw.nextKeyTyped();
             if (typed == 'C') {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+    public Boolean Lpressed(){
+        if (StdDraw.hasNextKeyTyped()) {
+            char typed = StdDraw.nextKeyTyped();
+            if (typed == 'L') {
                 return true;
             } else {
                 return false;
@@ -180,8 +204,8 @@ public class drawing {
 //                if (stringTyped == ":Q") {
 //                    break;
 //                }
-            movement.move(stringTyped, world);
-            ter.renderFrame(world);
+            movement.move(stringTyped, world, ter);
+//            ter.renderFrame(world);
         }
     }
     public void TplayerMoves(TETile [][] world, TERenderer ter){
@@ -191,8 +215,8 @@ public class drawing {
 //                if (stringTyped == ":Q") {
 //                    break;
 //                }
-            movement.Tmove(stringTyped, world);
-            ter.renderFrame(world);
+            movement.Tmove(stringTyped, world, ter);
+//            ter.renderFrame(world);
         }
     }
     public void GplayerMoves(TETile [][] world, TERenderer ter){
@@ -202,8 +226,8 @@ public class drawing {
 //                if (stringTyped == ":Q") {
 //                    break;
 //                }
-            movement.Gmove(stringTyped, world);
-            ter.renderFrame(world);
+            movement.Gmove(stringTyped, world, ter);
+//            ter.renderFrame(world);
         }
     }
     public void FplayerMoves(TETile [][] world, TERenderer ter){
@@ -213,8 +237,8 @@ public class drawing {
 //                if (stringTyped == ":Q") {
 //                    break;
 //                }
-            movement.Fmove(stringTyped, world);
-            ter.renderFrame(world);
+            movement.Fmove(stringTyped, world, ter);
+//            ter.renderFrame(world);
         }
     }
 
