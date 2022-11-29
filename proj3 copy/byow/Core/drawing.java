@@ -99,7 +99,7 @@ public class drawing {
                                 if (typed == 'w' || typed == 'a' || typed == 's' || typed == 'd') {
                                     moves += typed;
                                 }
-                                movement.move(String.valueOf(typed), world);
+                                movement.move(String.valueOf(typed), world, ter);
                                 double x = StdDraw.mouseX();
                                 double y = StdDraw.mouseY();
                                 mousePos(x, y, world, ter);
@@ -130,7 +130,7 @@ public class drawing {
                                 if (typed == 'w' || typed == 'a' || typed == 's' || typed == 'd') {
                                     moves += typed;
                                 }
-                                movement.move(String.valueOf(typed), world);
+                                movement.move(String.valueOf(typed), world, ter);
                                 double x = StdDraw.mouseX();
                                 double y = StdDraw.mouseY();
                                 mousePos(x, y, world, ter);
@@ -153,7 +153,7 @@ public class drawing {
         TETile[][] world = worldBuilder(seed);
         String[] moves = in.readLine().split("");
         for (int i = 0; i < moves.length; i++) {
-            movement.move(moves[i], world);
+            movement.move(moves[i], world, ter);
         }
         return world;
     }
@@ -187,7 +187,7 @@ public class drawing {
         if(StdDraw.hasNextKeyTyped()){
             char typed = StdDraw.nextKeyTyped();
             String stringTyped = String.valueOf(typed);
-            movement.move(stringTyped, world);
+            movement.move(stringTyped, world, ter);
             ter.renderFrame(world);
         }
     }

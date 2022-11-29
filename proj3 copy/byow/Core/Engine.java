@@ -117,9 +117,9 @@ public class Engine {
         }
         world[xAv][yAv] = Tileset.AVATAR;
         bigWorld.avTrackerAdder(xAv, yAv);
-        for(int h = letters; h < seedSplit.size(); h++){
-            movement.move(String.valueOf(seedSplit.get(h)), world);
-        }
+//        for(int h = letters; h < seedSplit.size(); h++){
+//            movement.move(String.valueOf(seedSplit.get(h)), world);
+//        }
         return world;
     }
 }

@@ -97,28 +97,112 @@ public class bigWorld {
     }
     public static void avatarUp(TETile[][] world){
         Coordinate current = avatarTracker.get("avatar");
-        world[current.x][current.y+1] = Tileset.AVATAR;
+        world[current.x][current.y + 1] = Tileset.AVATAR;
+        world[current.x][current.y] = Tileset.MOUNTAIN;
+        Coordinate up = new Coordinate(current.x, current.y+1);
+        avatarTracker.put("avatar", up);
+    }
+    public static void FavatarUp(TETile[][] world){
+        Coordinate current = avatarTracker.get("avatar");
+        world[current.x][current.y + 1] = Tileset.FLOWER;
+        world[current.x][current.y] = Tileset.MOUNTAIN;
+        Coordinate up = new Coordinate(current.x, current.y+1);
+        avatarTracker.put("avatar", up);
+    }
+    public static void TavatarUp(TETile[][] world){
+        Coordinate current = avatarTracker.get("avatar");
+        world[current.x][current.y + 1] = Tileset.TREE;
+        world[current.x][current.y] = Tileset.MOUNTAIN;
+        Coordinate up = new Coordinate(current.x, current.y+1);
+        avatarTracker.put("avatar", up);
+    }
+    public static void GavatarUp(TETile[][] world){
+        Coordinate current = avatarTracker.get("avatar");
+        world[current.x][current.y + 1] = Tileset.GRASS;
         world[current.x][current.y] = Tileset.MOUNTAIN;
         Coordinate up = new Coordinate(current.x, current.y+1);
         avatarTracker.put("avatar", up);
     }
     public static void avatarRight(TETile[][] world){
         Coordinate current = avatarTracker.get("avatar");
-        world[current.x+1][current.y] = Tileset.AVATAR;
+        world[current.x + 1][current.y] = Tileset.AVATAR;
         world[current.x][current.y] = Tileset.MOUNTAIN;
         Coordinate right = new Coordinate(current.x+1, current.y);
         avatarTracker.put("avatar", right);
     }
+    public static void FavatarRight(TETile[][] world) {
+        Coordinate current = avatarTracker.get("avatar");
+        world[current.x + 1][current.y] = Tileset.FLOWER;
+        world[current.x][current.y] = Tileset.MOUNTAIN;
+        Coordinate right = new Coordinate(current.x + 1, current.y);
+        avatarTracker.put("avatar", right);
+    }
+    public static void TavatarRight(TETile[][] world) {
+        Coordinate current = avatarTracker.get("avatar");
+        world[current.x + 1][current.y] = Tileset.TREE;
+        world[current.x][current.y] = Tileset.MOUNTAIN;
+        Coordinate right = new Coordinate(current.x + 1, current.y);
+        avatarTracker.put("avatar", right);
+    }
+    public static void GavatarRight(TETile[][] world) {
+        Coordinate current = avatarTracker.get("avatar");
+        world[current.x + 1][current.y] = Tileset.GRASS;
+        world[current.x][current.y] = Tileset.MOUNTAIN;
+        Coordinate right = new Coordinate(current.x + 1, current.y);
+        avatarTracker.put("avatar", right);
+    }
     public static void avatarDown(TETile[][] world){
         Coordinate current = avatarTracker.get("avatar");
-        world[current.x][current.y-1] = Tileset.AVATAR;
+        world[current.x][current.y - 1] = Tileset.AVATAR;
+        world[current.x][current.y] = Tileset.MOUNTAIN;
+        Coordinate down = new Coordinate(current.x, current.y-1);
+        avatarTracker.put("avatar", down);
+    }
+    public static void TavatarDown(TETile[][] world){
+        Coordinate current = avatarTracker.get("avatar");
+        world[current.x][current.y - 1] = Tileset.TREE;
+        world[current.x][current.y] = Tileset.MOUNTAIN;
+        Coordinate down = new Coordinate(current.x, current.y-1);
+        avatarTracker.put("avatar", down);
+    }
+    public static void FavatarDown(TETile[][] world){
+        Coordinate current = avatarTracker.get("avatar");
+        world[current.x][current.y - 1] = Tileset.FLOWER;
+        world[current.x][current.y] = Tileset.MOUNTAIN;
+        Coordinate down = new Coordinate(current.x, current.y-1);
+        avatarTracker.put("avatar", down);
+    }
+    public static void GavatarDown(TETile[][] world){
+        Coordinate current = avatarTracker.get("avatar");
+        world[current.x][current.y - 1] = Tileset.GRASS;
         world[current.x][current.y] = Tileset.MOUNTAIN;
         Coordinate down = new Coordinate(current.x, current.y-1);
         avatarTracker.put("avatar", down);
     }
     public static void avatarLeft( TETile[][] world){
         Coordinate current = avatarTracker.get("avatar");
-        world[current.x-1][current.y] = Tileset.AVATAR;
+        world[current.x - 1][current.y] = Tileset.AVATAR;
+        world[current.x][current.y] = Tileset.MOUNTAIN;
+        Coordinate left = new Coordinate(current.x-1, current.y);
+        avatarTracker.put("avatar", left);
+    }
+    public static void FavatarLeft( TETile[][] world){
+        Coordinate current = avatarTracker.get("avatar");
+        world[current.x - 1][current.y] = Tileset.FLOWER;
+        world[current.x][current.y] = Tileset.MOUNTAIN;
+        Coordinate left = new Coordinate(current.x-1, current.y);
+        avatarTracker.put("avatar", left);
+    }
+    public static void TavatarLeft( TETile[][] world){
+        Coordinate current = avatarTracker.get("avatar");
+        world[current.x - 1][current.y] = Tileset.TREE;
+        world[current.x][current.y] = Tileset.MOUNTAIN;
+        Coordinate left = new Coordinate(current.x-1, current.y);
+        avatarTracker.put("avatar", left);
+    }
+    public static void GavatarLeft( TETile[][] world){
+        Coordinate current = avatarTracker.get("avatar");
+        world[current.x - 1][current.y] = Tileset.GRASS;
         world[current.x][current.y] = Tileset.MOUNTAIN;
         Coordinate left = new Coordinate(current.x-1, current.y);
         avatarTracker.put("avatar", left);
@@ -126,5 +210,9 @@ public class bigWorld {
     public static void avTrackerAdder(int x, int y){
         Coordinate av = new Coordinate(x,y);
         avatarTracker.put("avatar", av);
+    }
+    public static Coordinate avTrackerGetter(){
+        Coordinate coord = avatarTracker.get("avatar");
+        return coord;
     }
 }
