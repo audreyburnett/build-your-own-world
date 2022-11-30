@@ -175,6 +175,15 @@ public class drawing {
                     TETile[][] world = load(filename.getName(), ter, avatar);
                     ter.renderFrame(world);
                     while (true) {
+                        double priorX = 0.0;
+                        double priorY = 0.0;
+                        double x = StdDraw.mouseX();
+                        double y = StdDraw.mouseY();
+                        while (x != priorX && y != priorY) {
+                            mousePos(x, y, world, ter);
+                            priorX = x;
+                            priorY = y;
+                        }
                         if (StdDraw.hasNextKeyTyped()) {
                             typed = StdDraw.nextKeyTyped();
                             if (typed == ':') {
@@ -195,9 +204,6 @@ public class drawing {
                                     moves += typed;
                                 }
 //                                movement.move(String.valueOf(typed), world, ter);
-                                double x = StdDraw.mouseX();
-                                double y = StdDraw.mouseY();
-                                mousePos(x, y, world, ter);
                             }
                         }
                     }
@@ -373,6 +379,13 @@ public class drawing {
         }
         Room.hallwayMakerRight(world);
         Room.hallwayMakerUp(world);
+        Room.hallwayMakerDown(world);
+        Room.hallwayMakerLeft(world);
+        bigWorld.worldAdjust(world);
+        Room.hallwayMakerRight(world);
+        Room.hallwayMakerUp(world);
+        Room.hallwayMakerDown(world);
+        Room.hallwayMakerLeft(world);
         bigWorld.worldAdjust(world);
         int xDoor = rnd.nextInt(80);
         int yDoor = rnd.nextInt(30);

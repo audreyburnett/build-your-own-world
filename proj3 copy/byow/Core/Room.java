@@ -13,7 +13,8 @@ public class Room {
     private int y;
     private int length;
     private int width;
-    private static HashSet<Room> roomTracker = new HashSet<>();
+    public static HashSet<Room> roomTracker = new HashSet<>();
+    static HashSet<Room> notConnected = new HashSet<>();
     private static HashSet<Coordinate> doorTracker = new HashSet<Coordinate>();
 
     public Room(int x, int y, int length, int width) {
@@ -23,17 +24,20 @@ public class Room {
         this.width = width;
         this.roomTracker = roomTracker;
     }
-    /** returns arraylist with orig coord first and first wall hit coord second*/
-    public static ArrayList hallwayFinderRight(Room origin, TETile[][] world){
+
+    /**
+     * returns arraylist with orig coord first and first wall hit coord second
+     */
+    public static ArrayList hallwayFinderRight(Room origin, TETile[][] world) {
         int right = origin.x + origin.width - 1;
         int bottom = origin.y;
-        int top = origin.y + origin.length -1;
+        int top = origin.y + origin.length - 1;
         ArrayList answer = new ArrayList();
-        for(int wallY = bottom + 1; wallY < top; wallY++){
+        for (int wallY = bottom + 1; wallY < top; wallY++) {
             int currY = wallY;
             int currX = right;
-            for(int probe = right; probe < 79; probe++){
-                if(world[probe + 1][wallY] == Tileset.SAND){
+            for (int probe = right; probe < 79; probe++) {
+                if (world[probe + 1][wallY] == Tileset.SAND && world[probe + 1][wallY + 1] == Tileset.SAND && world[probe + 1][wallY - 1] == Tileset.SAND) {
                     Coordinate originCoord = new Coordinate(currX, currY);
                     Coordinate destinationCoord = new Coordinate(probe + 1, wallY);
                     answer.add(originCoord);
@@ -44,16 +48,17 @@ public class Room {
         }
         return null;
     }
-    public static ArrayList hallwayFinderUp(Room origin, TETile[][] world){
+
+    public static ArrayList hallwayFinderUp(Room origin, TETile[][] world) {
         int top = origin.y + origin.length - 1;
         int left = origin.x;
         int right = origin.x + origin.width - 1;
         ArrayList answer = new ArrayList();
-        for(int wallX = left + 1; wallX < right; wallX ++){
+        for (int wallX = left + 1; wallX < right; wallX++) {
             int currX = wallX;
             int currY = top;
-            for(int probe = top; probe < 29; probe++){
-                if(world[wallX][probe + 1] == Tileset.SAND){
+            for (int probe = top; probe < 29; probe++) {
+                if (world[wallX][probe + 1] == Tileset.SAND && world[wallX - 1][probe + 1] == Tileset.SAND && world[wallX + 1][probe + 1] == Tileset.SAND) {
                     Coordinate originCoord = new Coordinate(currX, currY);
                     Coordinate destinationCoord = new Coordinate(wallX, probe + 1);
                     answer.add(originCoord);
@@ -64,25 +69,135 @@ public class Room {
         }
         return null;
     }
-    public static void hallwayMakerRight(TETile[][] world){
-        for(Room origin : roomTracker){
-            if(hallwayFinderRight(origin, world) == null){
-                continue;
+
+    public static ArrayList hallwayFinderDown(Room origin, TETile[][] world) {
+        int bottom = origin.y;
+        int left = origin.x;
+        int right = origin.x + origin.width - 1;
+        ArrayList answer = new ArrayList();
+        for (int wallX = left + 1; wallX < right; wallX++) {
+            int currX = wallX;
+            int currY = bottom;
+            for (int probe = bottom; probe > 0; probe--) {
+                if (world[wallX][probe - 1] == Tileset.SAND && world[wallX - 1][probe - 1] == Tileset.SAND && world[wallX + 1][probe - 1] == Tileset.SAND) {
+                    Coordinate originCoord = new Coordinate(currX, currY);
+                    Coordinate destinationCoord = new Coordinate(wallX, probe - 1);
+                    answer.add(originCoord);
+                    answer.add(destinationCoord);
+                    return answer;
+                }
             }
-            else{
+        }
+        return null;
+    }
+
+    public static ArrayList hallwayFinderLeft(Room origin, TETile[][] world) {
+        int left = origin.x;
+        int bottom = origin.y;
+        int top = origin.y + origin.length - 1;
+        ArrayList answer = new ArrayList();
+        for (int wallY = bottom + 1; wallY < top; wallY++) {
+            int currY = wallY;
+            int currX = left;
+            for (int probe = left; probe > 0; probe--) {
+                if (world[probe - 1][wallY] == Tileset.SAND && world[probe - 1][wallY + 1] == Tileset.SAND && world[probe - 1][wallY - 1] == Tileset.SAND) {
+                    Coordinate originCoord = new Coordinate(currX, currY);
+                    Coordinate destinationCoord = new Coordinate(probe - 1, wallY);
+                    answer.add(originCoord);
+                    answer.add(destinationCoord);
+                    return answer;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static void hallwayMakerRight(TETile[][] world) {
+        for (Room origin : roomTracker) {
+            if (hallwayFinderRight(origin, world) == null) {
+                continue;
+            } else {
                 ArrayList coords = hallwayFinderRight(origin, world);
                 hallway.connectRight(coords, world);
             }
         }
     }
-    public static void hallwayMakerUp(TETile[][] world){
-        for(Room origin : roomTracker){
-            if(hallwayFinderUp(origin, world) == null){
+
+    public static boolean rightBool(TETile[][] world, Room origin) {
+        if (hallwayFinderRight(origin, world) == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public static boolean upBool(TETile[][] world, Room origin) {
+        if (hallwayFinderUp(origin, world) == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public static void hallwayMakerUp(TETile[][] world) {
+        for (Room origin : roomTracker) {
+            if (hallwayFinderUp(origin, world) == null) {
                 continue;
-            }
-            else{
+            } else {
                 ArrayList coords = hallwayFinderUp(origin, world);
                 hallway.connectUp(coords, world);
+            }
+        }
+    }
+
+    public static void hallwayMakerDown(TETile[][] world) {
+        for (Room origin : roomTracker) {
+            if (hallwayFinderDown(origin, world) == null) {
+                continue;
+            } else {
+                ArrayList coords = hallwayFinderDown(origin, world);
+                hallway.connectDown(coords, world);
+            }
+        }
+    }
+
+    public static void hallwayMakerLeft(TETile[][] world) {
+        for (Room origin : roomTracker) {
+            if (hallwayFinderLeft(origin, world) == null) {
+                continue;
+            } else {
+                ArrayList coords = hallwayFinderLeft(origin, world);
+                hallway.connectLeft(coords, world);
+            }
+        }
+    }
+
+    public static void notConnectedConnectorUp(TETile[][] world) {
+        if (notConnected.size() == 0) {
+            return;
+        } else {
+            for (Room origin : notConnected) {
+                if (hallwayFinderUp(origin, world) == null) {
+                    continue;
+                } else {
+                    ArrayList coords = hallwayFinderUp(origin, world);
+                    hallway.connectUp(coords, world);
+                }
+            }
+        }
+    }
+
+    public static void notConnectedConnectorDown(TETile[][] world) {
+        if (notConnected.size() == 0) {
+            return;
+        } else {
+            for (Room origin : notConnected) {
+                if (hallwayFinderDown(origin, world) == null) {
+                    continue;
+                } else {
+                    ArrayList coords = hallwayFinderDown(origin, world);
+                    hallway.connectDown(coords, world);
+                }
             }
         }
     }
