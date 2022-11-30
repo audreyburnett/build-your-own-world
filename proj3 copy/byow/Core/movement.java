@@ -27,13 +27,6 @@ public class movement {
                 ter.renderFrame(world);
             }
         }
-        if (n.equals("L")){
-            Coordinate av = bigWorld.avTrackerGetter();
-            ter.renderLightFrame(world, av);
-        }
-        if (n.equals("K")){
-            ter.renderFrame(world);
-        }
     }
     public static void Fmove(String n, TETile[][] world, TERenderer ter) {
         if (n.equals("w")) {
@@ -59,13 +52,6 @@ public class movement {
                 bigWorld.FavatarLeft(world);
                 ter.renderFrame(world);
             }
-        }
-        if (n.equals("L")){
-            Coordinate av = bigWorld.avTrackerGetter();
-            ter.renderLightFrame(world, av);
-        }
-        if (n.equals("K")){
-            ter.renderFrame(world);
         }
     }
     public static void Tmove(String n, TETile[][] world, TERenderer ter) {
@@ -93,13 +79,6 @@ public class movement {
                 ter.renderFrame(world);
             }
         }
-        if (n.equals("L")){
-            Coordinate av = bigWorld.avTrackerGetter();
-            ter.renderLightFrame(world, av);
-        }
-        if (n.equals("K")){
-            ter.renderFrame(world);
-        }
     }
     public static void Gmove(String n, TETile[][] world, TERenderer ter) {
         if (n.equals("w")) {
@@ -125,13 +104,6 @@ public class movement {
                 bigWorld.GavatarLeft(world);
                 ter.renderFrame(world);
             }
-        }
-        if (n.equals("L")){
-            Coordinate av = bigWorld.avTrackerGetter();
-            ter.renderLightFrame(world, av);
-        }
-        if (n.equals("K")){
-            ter.renderFrame(world);
         }
     }
 }

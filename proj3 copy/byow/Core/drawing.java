@@ -81,7 +81,6 @@ public class drawing {
                     avatar = selected();
                     mainMenu();
                     continue;
-
                 }
                 if (typed == 'N' || typed == 'n') {
                     seedPrompt();
