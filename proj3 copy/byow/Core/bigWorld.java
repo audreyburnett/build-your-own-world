@@ -1,23 +1,87 @@
 package byow.Core;
-import java.util.ArrayList;
+import java.util.*;
+
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 import byow.Core.RandomUtils;
 import java.lang.Math;
-import java.util.HashMap;
-import java.util.Random;
+
+import static java.lang.Math.abs;
 
 public class bigWorld {
-    public static HashMap<String, Coordinate> avatarTracker= new HashMap<>();
-    public static void buildRoom(int x, int y, TETile[][] world, int length, int width){
+
+    private HashSet<Room> roomTracker = new HashSet<>();
+
+    public bigWorld(){}
+    public TETile[][] buildBigWorld(int worldHeight, int worldWidth, long seed, TETile[][] world) {
+        for (int x = 0; x < worldWidth; x += 1) {
+            for (int y = 0; y < worldHeight; y += 1) {
+                world[x][y] = Tileset.WATER;
+            }
+        }
+        Random rnd = new Random();
+        rnd.setSeed(seed);
+        int numRooms = rnd.nextInt(2000);
+        for(int i = 0; i < numRooms; i ++) {
+            int xCoord = rnd.nextInt(70);
+            int yCoord = rnd.nextInt(20);
+            int width = rnd.nextInt(10);
+            int length = rnd.nextInt(10);
+            if (width < 4 || length < 4) {
+                while (width < 4 || length < 4) {
+                    width = rnd.nextInt(10);
+                    length = rnd.nextInt(10);
+                }
+            }
+            Room roomCurr = new Room(xCoord, yCoord, length, width);
+            if (!overlap(roomCurr, world)) {
+                buildRoom(xCoord, yCoord, world, length, width);
+                addRoom(roomCurr);
+            }
+        }
+        List<Room> sortedRoomTracker = sort(roomTracker);
+        for (int i = 0; i < sortedRoomTracker.size() - 1; i++ ) {
+            Room a = sortedRoomTracker.get(i);
+            Room b = sortedRoomTracker.get(i+1);
+            int XOrigin = a.x + rnd.nextInt(a.width - 2) + 1;
+            int YOrigin = a.y + rnd.nextInt(a.length - 2) + 1;
+            int XDestination = b.x + rnd.nextInt(b.width - 2) + 1;
+            int YDestination = b.y + rnd.nextInt(b.length - 2) + 1;
+            buildHallway(XOrigin, YOrigin, XDestination, YDestination, world);
+        }
+        int xAv = rnd.nextInt(80);
+        int yAv = rnd.nextInt(30);
+        while(world[xAv][yAv] != Tileset.MOUNTAIN){
+            xAv = rnd.nextInt(80);
+            yAv = rnd.nextInt(30);
+        }
+
+        return world;
+    }
+
+    public class Room {
+        private int x;
+        private int y;
+        private int length;
+        private int width;
+
+        public Room(int x, int y, int length, int width) {
+            this.x = x;
+            this.y = y;
+            this.length = length;
+            this.width = width;
+        }
+    }
+
+    private void buildRoom(int x, int y, TETile[][] world, int length, int width){
         for(int start = x; start < x + width; start ++){
             world[start][y] = Tileset.SAND;
-            world[start][java.lang.Math.abs(y + length - 1)] = Tileset.SAND;
+            world[start][abs(y + length - 1)] = Tileset.SAND;
 
         }
         for(int upStart = y; upStart < y + length; upStart ++){
             world[x][upStart] = Tileset.SAND;
-            world[java.lang.Math.abs(x+width - 1)][upStart] = Tileset.SAND;
+            world[abs(x+width - 1)][upStart] = Tileset.SAND;
         }
         /** builds floors*/
         for(int start = x + 1; start < x + width - 1; start ++){
@@ -27,192 +91,86 @@ public class bigWorld {
         }
     }
 
-    public static void worldAdjust(TETile[][] world){
-        for( int x = 1; x < 79; x ++){
-            for(int y = 1; y < 29; y++){
-                if(world[x][y] == Tileset.SAND){
-                    if(world[x][y-1] == Tileset.MOUNTAIN && world[x][y+1] == Tileset.MOUNTAIN){
-                        world[x][y] = Tileset.MOUNTAIN;
-                    }
-                    if(world[x+1][y] == Tileset.MOUNTAIN && world[x-1][y] == Tileset.MOUNTAIN){
-                        world[x][y] = Tileset.MOUNTAIN;
-                    }
-                    if(world[x][y - 1] == Tileset.WATER && world[x-1][y] == Tileset.MOUNTAIN && world[x-1][y-1] == Tileset.SAND){
-                        world[x][y] = Tileset.MOUNTAIN;
-                        world[x][y -1] = Tileset.SAND;
-                    }
-                }
-                if(world[x][y] == Tileset.MOUNTAIN){
-                    if(world[x - 1][y] == Tileset.MOUNTAIN && world[x+1][y] == Tileset.WATER){
-                        world[x][y] = Tileset.SAND;
-                    }
-                    if(world[x + 1][y] == Tileset.MOUNTAIN && world[x - 1][y] == Tileset.WATER){
-                        world[x][y] = Tileset.SAND;
-                    }
-                    if(world[x][y-1] == Tileset.MOUNTAIN && world[x][y+1] == Tileset.WATER){
-                        world[x][y] = Tileset.SAND;
-                    }
-                    if(world[x][y+1] == Tileset.MOUNTAIN && world[x][y-1] == Tileset.WATER) {
-                        world[x][y] = Tileset.SAND;
-                    }
-                }
+    private void buildHallway(int oX, int oY, int dX, int dY, TETile[][] world) {
+        int xDistance = oX - dX;
+        int yDistance = oY - dY;
+        int xdirection = 0;
+        int ydirection = 0;
+        if (xDistance < 0) {
+            xdirection = 1;
+        } else {
+            xdirection = -1;
+        }
+        if (yDistance < 0) {
+            ydirection = 1;
+        } else {
+            ydirection = -1;
+        }
+        int xIncrement = 0;
+        int yIncrement = 0;
+        for (int x = 0; x < abs(xDistance); x++) {
+            world[oX + xIncrement][oY] = Tileset.MOUNTAIN;
+            xIncrement += xdirection;
+        }
+        for (int y = 0; y < abs(yDistance); y++) {
+            world[oX + xIncrement][oY + yIncrement] = Tileset.MOUNTAIN;
+            yIncrement += ydirection;
+        }
+        buildHorizontalWalls(oX, oY, abs(xDistance), xdirection, world);
+        buildVerticalWalls(oX + xIncrement, oY, abs(yDistance), ydirection, world);
+    }
+
+    private void buildHorizontalWalls(int xOrigin, int yOrigin, int length, int direction, TETile[][] world) {
+        for (int i = 0; i <= length + 1; i ++) {
+            if (world[xOrigin + (direction * i)][yOrigin + direction] == Tileset.WATER) {
+                world[xOrigin + (direction * i)][yOrigin + direction] = Tileset.SAND;
+            }
+            if (world[xOrigin + (direction * i)][yOrigin - direction] == Tileset.WATER) {
+                world[xOrigin + (direction * i)][yOrigin - direction] = Tileset.SAND;
             }
         }
     }
-    public static Boolean movementCheckerUp(TETile[][] world){
-        Coordinate current = avatarTracker.get("avatar");
-        if(world[current.x][current.y + 1] == Tileset.MOUNTAIN){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-    public static Boolean movementCheckerRight( TETile[][] world){
-        Coordinate current = avatarTracker.get("avatar");
-        if(world[current.x + 1][current.y] == Tileset.MOUNTAIN){
-            return true;
-        }
-        else{
-            return false;
+
+    private void buildVerticalWalls(int xOrigin, int yOrigin, int length, int direction, TETile[][] world) {
+        for (int i = 0; i <= length; i ++) {
+            if (world[xOrigin - 1][yOrigin + (direction * i)] == Tileset.WATER) {
+                world[xOrigin - 1][yOrigin + (direction * i)] = Tileset.SAND;
+            }
+            if (world[xOrigin + 1][yOrigin + (direction * i)] == Tileset.WATER) {
+                world[xOrigin + 1][yOrigin + (direction * i)] = Tileset.SAND;
+            }
         }
     }
-    public static Boolean movementCheckerDown(TETile[][] world){
-        Coordinate current = avatarTracker.get("avatar");
-        if(world[current.x][current.y - 1] == Tileset.MOUNTAIN){
-            return true;
+
+    private void addRoom(Room room) {
+        roomTracker.add(room);
+    }
+
+    private List<Room> sort(HashSet<Room> roomTracker) {
+        List<Room> roomList = new ArrayList<Room>(roomTracker);
+        Comparator<Room> c = new bigWorld.sortByX();
+        Collections.sort(roomList, c);
+        return roomList;
+    }
+
+    class sortByX implements Comparator<Room> {
+        public int compare(Room a, Room b) {
+            return a.x - b.x;
         }
-        else{
-            return false;
+    }
+
+    private Boolean overlap(Room a, TETile[][] world) {
+        for (int i = a.x; i < a.x + a.width; i++) {
+            for (int j = a.y; j < a.y + a.length; j++) {
+                if (world[i][j] != Tileset.WATER) {
+                    return true;
+                }
+            }
         }
-    }
-    public static Boolean movementCheckerLeft(TETile[][] world){
-        Coordinate current = avatarTracker.get("avatar");
-        if(world[current.x - 1][current.y] == Tileset.MOUNTAIN){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-    public static void avatarUp(TETile[][] world){
-        Coordinate current = avatarTracker.get("avatar");
-        world[current.x][current.y + 1] = Tileset.AVATAR;
-        world[current.x][current.y] = Tileset.MOUNTAIN;
-        Coordinate up = new Coordinate(current.x, current.y+1);
-        avatarTracker.put("avatar", up);
-    }
-    public static void FavatarUp(TETile[][] world){
-        Coordinate current = avatarTracker.get("avatar");
-        world[current.x][current.y + 1] = Tileset.FLOWER;
-        world[current.x][current.y] = Tileset.MOUNTAIN;
-        Coordinate up = new Coordinate(current.x, current.y+1);
-        avatarTracker.put("avatar", up);
-    }
-    public static void TavatarUp(TETile[][] world){
-        Coordinate current = avatarTracker.get("avatar");
-        world[current.x][current.y + 1] = Tileset.TREE;
-        world[current.x][current.y] = Tileset.MOUNTAIN;
-        Coordinate up = new Coordinate(current.x, current.y+1);
-        avatarTracker.put("avatar", up);
-    }
-    public static void GavatarUp(TETile[][] world){
-        Coordinate current = avatarTracker.get("avatar");
-        world[current.x][current.y + 1] = Tileset.GRASS;
-        world[current.x][current.y] = Tileset.MOUNTAIN;
-        Coordinate up = new Coordinate(current.x, current.y+1);
-        avatarTracker.put("avatar", up);
-    }
-    public static void avatarRight(TETile[][] world){
-        Coordinate current = avatarTracker.get("avatar");
-        world[current.x + 1][current.y] = Tileset.AVATAR;
-        world[current.x][current.y] = Tileset.MOUNTAIN;
-        Coordinate right = new Coordinate(current.x+1, current.y);
-        avatarTracker.put("avatar", right);
-    }
-    public static void FavatarRight(TETile[][] world) {
-        Coordinate current = avatarTracker.get("avatar");
-        world[current.x + 1][current.y] = Tileset.FLOWER;
-        world[current.x][current.y] = Tileset.MOUNTAIN;
-        Coordinate right = new Coordinate(current.x + 1, current.y);
-        avatarTracker.put("avatar", right);
-    }
-    public static void TavatarRight(TETile[][] world) {
-        Coordinate current = avatarTracker.get("avatar");
-        world[current.x + 1][current.y] = Tileset.TREE;
-        world[current.x][current.y] = Tileset.MOUNTAIN;
-        Coordinate right = new Coordinate(current.x + 1, current.y);
-        avatarTracker.put("avatar", right);
-    }
-    public static void GavatarRight(TETile[][] world) {
-        Coordinate current = avatarTracker.get("avatar");
-        world[current.x + 1][current.y] = Tileset.GRASS;
-        world[current.x][current.y] = Tileset.MOUNTAIN;
-        Coordinate right = new Coordinate(current.x + 1, current.y);
-        avatarTracker.put("avatar", right);
-    }
-    public static void avatarDown(TETile[][] world){
-        Coordinate current = avatarTracker.get("avatar");
-        world[current.x][current.y - 1] = Tileset.AVATAR;
-        world[current.x][current.y] = Tileset.MOUNTAIN;
-        Coordinate down = new Coordinate(current.x, current.y-1);
-        avatarTracker.put("avatar", down);
-    }
-    public static void TavatarDown(TETile[][] world){
-        Coordinate current = avatarTracker.get("avatar");
-        world[current.x][current.y - 1] = Tileset.TREE;
-        world[current.x][current.y] = Tileset.MOUNTAIN;
-        Coordinate down = new Coordinate(current.x, current.y-1);
-        avatarTracker.put("avatar", down);
-    }
-    public static void FavatarDown(TETile[][] world){
-        Coordinate current = avatarTracker.get("avatar");
-        world[current.x][current.y - 1] = Tileset.FLOWER;
-        world[current.x][current.y] = Tileset.MOUNTAIN;
-        Coordinate down = new Coordinate(current.x, current.y-1);
-        avatarTracker.put("avatar", down);
-    }
-    public static void GavatarDown(TETile[][] world){
-        Coordinate current = avatarTracker.get("avatar");
-        world[current.x][current.y - 1] = Tileset.GRASS;
-        world[current.x][current.y] = Tileset.MOUNTAIN;
-        Coordinate down = new Coordinate(current.x, current.y-1);
-        avatarTracker.put("avatar", down);
-    }
-    public static void avatarLeft( TETile[][] world){
-        Coordinate current = avatarTracker.get("avatar");
-        world[current.x - 1][current.y] = Tileset.AVATAR;
-        world[current.x][current.y] = Tileset.MOUNTAIN;
-        Coordinate left = new Coordinate(current.x-1, current.y);
-        avatarTracker.put("avatar", left);
-    }
-    public static void FavatarLeft( TETile[][] world){
-        Coordinate current = avatarTracker.get("avatar");
-        world[current.x - 1][current.y] = Tileset.FLOWER;
-        world[current.x][current.y] = Tileset.MOUNTAIN;
-        Coordinate left = new Coordinate(current.x-1, current.y);
-        avatarTracker.put("avatar", left);
-    }
-    public static void TavatarLeft( TETile[][] world){
-        Coordinate current = avatarTracker.get("avatar");
-        world[current.x - 1][current.y] = Tileset.TREE;
-        world[current.x][current.y] = Tileset.MOUNTAIN;
-        Coordinate left = new Coordinate(current.x-1, current.y);
-        avatarTracker.put("avatar", left);
-    }
-    public static void GavatarLeft( TETile[][] world){
-        Coordinate current = avatarTracker.get("avatar");
-        world[current.x - 1][current.y] = Tileset.GRASS;
-        world[current.x][current.y] = Tileset.MOUNTAIN;
-        Coordinate left = new Coordinate(current.x-1, current.y);
-        avatarTracker.put("avatar", left);
-    }
-    public static void avTrackerAdder(int x, int y){
-        Coordinate av = new Coordinate(x,y);
-        avatarTracker.put("avatar", av);
-    }
-    public static Coordinate avTrackerGetter(){
-        Coordinate coord = avatarTracker.get("avatar");
-        return coord;
+        return false;
     }
 }
+
+
+
+
