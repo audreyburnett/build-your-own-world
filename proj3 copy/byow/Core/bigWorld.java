@@ -56,6 +56,11 @@ public class bigWorld {
                         world[x][y] = Tileset.SAND;
                     }
                 }
+                if(x == 0 || y == 0){
+                    if(world[x][y] == Tileset.MOUNTAIN){
+                        world[x][y] = Tileset.SAND;
+                    }
+                }
             }
         }
     }

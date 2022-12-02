@@ -381,11 +381,6 @@ public class drawing {
         Room.hallwayMakerDown(world);
         Room.hallwayMakerLeft(world);
         bigWorld.worldAdjust(world);
-        Room.hallwayMakerRight(world);
-        Room.hallwayMakerUp(world);
-        Room.hallwayMakerDown(world);
-        Room.hallwayMakerLeft(world);
-        bigWorld.worldAdjust(world);
         int xDoor = rnd.nextInt(80);
         int yDoor = rnd.nextInt(30);
         int xAv = rnd.nextInt(80);
