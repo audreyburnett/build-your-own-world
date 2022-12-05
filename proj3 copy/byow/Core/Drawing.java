@@ -168,17 +168,17 @@ public class Drawing {
                     }
                 }
                 if (typed == 'R' || typed == 'r') {
-                    replay(filename, ter);
+                    TETile[][] world = replay(filename, ter);
                     while (true) {
-//                                double priorX = 0.0;
-//                                double priorY = 0.0;
-//                                double x = StdDraw.mouseX();
-//                                double y = StdDraw.mouseY();
-//                                while (x != priorX && y != priorY) {
-//                                    mousePos(x, y, world, ter);
-//                                    priorX = x;
-//                                    priorY = y;
-//                                }
+                                double priorX = 0.0;
+                                double priorY = 0.0;
+                                double x = StdDraw.mouseX();
+                                double y = StdDraw.mouseY();
+                                while (x != priorX && y != priorY) {
+                                    mousePos(x, y, world, ter);
+                                    priorX = x;
+                                    priorY = y;
+                                }
                         if (StdDraw.hasNextKeyTyped()) {
                             typed = StdDraw.nextKeyTyped();
                             if (typed == ':') {
@@ -289,28 +289,16 @@ public class Drawing {
         String seed = "";
         while (input.charAt(i) != 'c') {
             seed += input.charAt(i);
+            i = i + 1;
         }
         System.out.println(seed);
         TETile[][] world = Engine.interactWithInputString(seed);
+        String moves = seed;
+        for (int j = i; j < input.length(); j ++) {
+            moves += input.charAt(j);
+            world = Engine.interactWithInputString(moves);
+        }
         return world;
-//        In in = new In(filename);
-//        String[] input = in.readLine().split("");
-//        String seed = "";
-//        TETile[][] world;
-//        int i = 0;
-//        while (!input[i].equals('s')) {
-//            seed += input[i];
-//            i = i + 1;
-//        }
-//        seed += 's';
-//        world = Engine.interactWithInputString(seed);
-//        i = i + 1;
-//        while (i < input[i].length()) {
-//            seed += input[i];
-//            world = Engine.interactWithInputString(seed);
-//            i = i + 1;
-//        }
-//        return world;
     }
 
     public void hudFrame(String s){

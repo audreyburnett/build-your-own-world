@@ -160,7 +160,11 @@ public class bigWorld {
 
     class sortByX implements Comparator<Room> {
         public int compare(Room a, Room b) {
-            return a.x - b.x;
+            if (a.x - b.x == 0) {
+                return a.y - b.y;
+            } else {
+                return a.x - b.x;
+            }
         }
     }
 
