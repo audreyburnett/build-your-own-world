@@ -13,7 +13,7 @@ public class bigWorld {
     private HashSet<Room> roomTracker = new HashSet<>();
 
     public bigWorld(){}
-    public TETile[][] buildBigWorld(int worldHeight, int worldWidth, long seed, TETile[][] world) {
+    public TETile[][] buildBigWorld(int worldHeight, int worldWidth, long seed, TETile[][] world, Avatar myPlayer) {
         for (int x = 0; x < worldWidth; x += 1) {
             for (int y = 0; y < worldHeight; y += 1) {
                 world[x][y] = Tileset.WATER;
@@ -22,6 +22,7 @@ public class bigWorld {
         Random rnd = new Random();
         rnd.setSeed(seed);
         int numRooms = rnd.nextInt(2000);
+//        System.out.println(numRooms);
         for(int i = 0; i < numRooms; i ++) {
             int xCoord = rnd.nextInt(70);
             int yCoord = rnd.nextInt(20);
@@ -33,6 +34,7 @@ public class bigWorld {
                     length = rnd.nextInt(10);
                 }
             }
+//            System.out.println(xCoord + yCoord + width + length);
             Room roomCurr = new Room(xCoord, yCoord, length, width);
             if (!overlap(roomCurr, world)) {
                 buildRoom(xCoord, yCoord, world, length, width);
@@ -47,15 +49,18 @@ public class bigWorld {
             int YOrigin = a.y + rnd.nextInt(a.length - 2) + 1;
             int XDestination = b.x + rnd.nextInt(b.width - 2) + 1;
             int YDestination = b.y + rnd.nextInt(b.length - 2) + 1;
+//            System.out.println(XOrigin + YOrigin + XDestination + YDestination);
             buildHallway(XOrigin, YOrigin, XDestination, YDestination, world);
         }
+
         int xAv = rnd.nextInt(80);
         int yAv = rnd.nextInt(30);
-        while(world[xAv][yAv] != Tileset.MOUNTAIN){
+        while(world[xAv][yAv] != Tileset.MOUNTAIN) {
             xAv = rnd.nextInt(80);
             yAv = rnd.nextInt(30);
         }
-
+//        System.out.println(xAv + yAv);
+        myPlayer.placeAvatar(xAv, yAv, myPlayer.avatar, world);
         return world;
     }
 
@@ -170,6 +175,8 @@ public class bigWorld {
         return false;
     }
 }
+
+
 
 
 

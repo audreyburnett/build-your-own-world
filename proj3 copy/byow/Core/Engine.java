@@ -1,5 +1,6 @@
 package byow.Core;
 import java.awt.*;
+import java.io.IOException;
 import java.util.Random;
 import java.util.*;
 import byow.TileEngine.TERenderer;
@@ -8,19 +9,19 @@ import byow.TileEngine.Tileset;
 import edu.princeton.cs.algs4.StdDraw;
 
 public class Engine {
-    TERenderer ter = new TERenderer();
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
-//    public static TETile[][] myWorld = new TETile[WIDTH][HEIGHT];
 
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
      * including inputs from the main menu.
      */
-    public void interactWithKeyboard() {
-//        drawing canvas = new drawing(ter, 80, 30, 0, 0);
-//        canvas.start(ter);
+    public void interactWithKeyboard() throws IOException {
+        TERenderer ter = new TERenderer();
+        ter.initialize(WIDTH, HEIGHT);
+        Drawing canvas = new Drawing(ter, 80, 30, 0, 0);
+        canvas.start(ter);
     }
 
     /**
@@ -52,66 +53,100 @@ public class Engine {
         //
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
-
+//        System.out.println(input);
         TERenderer ter = new TERenderer();
         ter.initialize(WIDTH, HEIGHT);
         TETile[][] myWorld = new TETile[WIDTH][HEIGHT];
-        /** adds each char from the user input to an array list*/
-        ArrayList seedSplit = new ArrayList();
+        ArrayList<Character> inputSplit = new ArrayList();
         for (char ch : input.toCharArray()) {
-            seedSplit.add(ch);
+            inputSplit.add(ch);
         }
-        /**sets the string seed to the seed*/
         String seed = "";
-        int j = 1;
+        Avatar myPlayer = new Avatar();
+        int j = 0;
+//        if (inputSplit.get(j).equals('n')) {
+//            j = 1;
+//        } else {
+//            while (!inputSplit.get(j).equals('n')) {
+//                if (inputSplit.get(j).equals('c')) {
+//                    char avatarSymbol = inputSplit.get(j+1);
+//                    myPlayer = new Avatar(avatarSymbol);
+//                    j = j + 2;
+//                }
+//            }
+//        }
         while (true) {
-            if (seedSplit.get(j).equals('s') || seedSplit.get(j).equals('S')) {
-                break;
+            if (inputSplit.get(j).equals('n') || inputSplit.get(j).equals('N')) {
+                j = j + 1;
+                continue;
             }
-            else {
-                seed += seedSplit.get(j);
-                j++;
+            if (inputSplit.get(j).equals('s') || inputSplit.get(j).equals('S')) {
+                j = j + 1;
+                break;
+            } else {
+                seed += inputSplit.get(j);
+                j = j + 1;
             }
         }
-        /** letters is the length of n***s */
-        int letters = j + 1;
-
-        /** sets the seed and creates the first room/hallway in a random place*/
+//        System.out.println(seed);
         Long longSeed = Long.valueOf(seed);
-
+        System.out.println(longSeed);
         bigWorld big = new bigWorld();
-        big.buildBigWorld(HEIGHT, WIDTH, longSeed, myWorld);
+        big.buildBigWorld(HEIGHT, WIDTH, longSeed, myWorld, myPlayer);
+        String moves = "";
+        for(int h = j; h < inputSplit.size(); ) {
+//            System.out.println(h);
+            if (inputSplit.get(h).equals('c')) {
+                char avatarSymbol = inputSplit.get(h + 1);
+                int x = myPlayer.avTrackerGetter().x;
+                int y = myPlayer.avTrackerGetter().y;
+                myPlayer = new Avatar(avatarSymbol);
+                myPlayer.placeAvatar(x, y, myPlayer.avatar, myWorld);
+                h = h + 2;
+                continue;
+            } else if (!(inputSplit.get(h).equals(':')) || !(inputSplit.get(h).equals('q')) || !(inputSplit.get(h).equals('l'))){
+                String nextMove = String.valueOf(inputSplit.get(h));
+                myPlayer.move(nextMove, myWorld, ter, myPlayer.avatar);
+                moves = moves + nextMove;
+                h = h + 1;
+            } else if ((inputSplit.get(h).equals(':')) || (inputSplit.get(h).equals('q')) || (inputSplit.get(h).equals('l'))){
+                h = h + 1;
+            }
+        }
         ter.renderFrame(myWorld);
         return myWorld;
     }
+
+
+    public String selected() {
+        String answer = "";
+        while (true) {
+            if (StdDraw.hasNextKeyTyped()) {
+                char typed = StdDraw.nextKeyTyped();
+                if (typed == 'T') {
+                    return "T";
+                }
+                if (typed == 'F') {
+                    return "F";
+                }
+                if (typed == 'G') {
+                    return "G";
+                }
+                if (typed == 'A') {
+                    return "a";
+                }
+            }
+        }
+    }
+
+//    public static void save(File filename, Out out, String seed, String moves, String avatar) {
+//        out.println(seed);
+//        out.println(avatar);
+//        out.println(moves);
+//    }
 }
-//        /** finds random x and y to put locked door*/
-//        int xDoor = rnd.nextInt(80);
-//        int yDoor = rnd.nextInt(30);
-//        int xAv = rnd.nextInt(80);
-//        int yAv = rnd.nextInt(30);
-//        while(world[xDoor][yDoor] != Tileset.SAND){
-//            xDoor = rnd.nextInt(80);
-//            yDoor = rnd.nextInt(30);
-//        }
-//        world[xDoor][yDoor] = Tileset.LOCKED_DOOR;
-//        /** finds random place to put avatar */
-//        while(world[xAv][yAv] != Tileset.MOUNTAIN){
-//            xAv = rnd.nextInt(80);
-//            yAv = rnd.nextInt(30);
-//        }
-//        world[xAv][yAv] = Tileset.AVATAR;
-//        bigWorld.avTrackerAdder(xAv, yAv);
-/** goes thru the users wasd moves and adds them to string */
-//        String moves = "";
-//        for(int h = letters; h < seedSplit.size(); h++){
-//            String nextMove = String.valueOf(seedSplit.get(h));
-//            movement.move(nextMove, world, ter);
-//            moves = moves + nextMove;
-//        }
-/** saves seed and moves to text file if :q*/
-//        if (moves.charAt(moves.length() - 1) == 'q' || moves.charAt(moves.length() - 1) == 'Q') {
-//            if (moves.charAt(moves.length() - 2) == ':') {
-//                drawing.save(fi, seed , moves);
-//            }
-//        }
+
+
+
+
+
