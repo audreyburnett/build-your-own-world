@@ -6,10 +6,34 @@ import byow.TileEngine.Tileset;
 import java.util.HashMap;
 
 public class Avatar {
-    private HashMap<String, Coordinate> avatarTracker= new HashMap<>();
+    public static HashMap<String, Coordinate> avatarTracker= new HashMap<>();
+    public static TETile avatar;
+    public static String avatarSymbol;
 
-    private void placeAvatar(int x, int y, TETile[][] world) {
-        world[x][y] = Tileset.AVATAR;
+    public Avatar() {
+        avatar = Tileset.AVATAR;
+    }
+    public Avatar(Character symbol) {
+        if (symbol.equals('a')) {
+            avatar = Tileset.AVATAR;
+            avatarSymbol = "a";
+        }
+        if (symbol.equals('T')) {
+            avatar = Tileset.TREE;
+            avatarSymbol = "T";
+        }
+        if (symbol.equals('F')) {
+            avatar = Tileset.FLOWER;
+            avatarSymbol = "F";
+        }
+        if (symbol.equals('G')) {
+            avatar = Tileset.GRASS;
+            avatarSymbol = "G";
+        }
+    }
+
+    public void placeAvatar(int x, int y, TETile myPlayer, TETile[][] world) {
+        world[x][y] = myPlayer;
         avTrackerAdder(x, y);
     }
     private Boolean movementCheckerUp(TETile[][] world){
@@ -77,15 +101,15 @@ public class Avatar {
         Coordinate left = new Coordinate(current.x-1, current.y);
         avatarTracker.put("avatar", left);
     }
-    private void avTrackerAdder(int x, int y){
+    public void avTrackerAdder(int x, int y){
         Coordinate av = new Coordinate(x,y);
         avatarTracker.put("avatar", av);
     }
-    private Coordinate avTrackerGetter(){
+    public Coordinate avTrackerGetter(){
         Coordinate coord = avatarTracker.get("avatar");
         return coord;
     }
-    private void move(String n, TETile[][] world, TERenderer ter, TETile avatar) {
+    public void move(String n, TETile[][] world, TERenderer ter, TETile avatar) {
         if (n.equals("w")) {
             if (movementCheckerUp(world)) {
                 avatarUp(world, avatar);
@@ -108,7 +132,7 @@ public class Avatar {
         }
     }
 
-    private void replayMove(String n, TETile[][] world, TERenderer ter, TETile avatar) {
+    public void replayMove(String n, TETile[][] world, TERenderer ter, TETile avatar) {
         if (n.equals("w")) {
             if (movementCheckerUp(world)) {
                 avatarUp(world, avatar);
