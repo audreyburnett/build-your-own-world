@@ -1,10 +1,13 @@
 package byow.Core;
 import byow.TileEngine.Tileset;
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.Out;
 import edu.princeton.cs.algs4.StdDraw;
 import java.awt.Color;
 import java.awt.Font;
 import java.io.*;
-
+import java.util.ArrayList;
+import java.util.Random;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 
@@ -133,7 +136,8 @@ public class Drawing {
                     }
                 }
                 if (typed == 'L' || typed == 'l') {
-                    TETile[][] world = load(filename);
+                    String input = load(filename);
+                    TETile[][] world = Engine.interactWithInputString(input);
                     while (true) {
                         double priorX = 0.0;
                         double priorY = 0.0;
@@ -170,15 +174,15 @@ public class Drawing {
                 if (typed == 'R' || typed == 'r') {
                     TETile[][] world = replay(filename, ter);
                     while (true) {
-                                double priorX = 0.0;
-                                double priorY = 0.0;
-                                double x = StdDraw.mouseX();
-                                double y = StdDraw.mouseY();
-                                while (x != priorX && y != priorY) {
-                                    mousePos(x, y, world, ter);
-                                    priorX = x;
-                                    priorY = y;
-                                }
+                        double priorX = 0.0;
+                        double priorY = 0.0;
+                        double x = StdDraw.mouseX();
+                        double y = StdDraw.mouseY();
+                        while (x != priorX && y != priorY) {
+                            mousePos(x, y, world, ter);
+                            priorX = x;
+                            priorY = y;
+                        }
                         if (StdDraw.hasNextKeyTyped()) {
                             typed = StdDraw.nextKeyTyped();
                             if (typed == ':') {
@@ -217,32 +221,26 @@ public class Drawing {
         while (true) {
             if (StdDraw.hasNextKeyTyped()) {
                 char typed = StdDraw.nextKeyTyped();
-                if (typed == 'T') {
+                if (typed == 'T' || typed == 't') {
                     return 'T';
                 }
-                if (typed == 'F') {
+                if (typed == 'F' || typed == 'f') {
                     return 'F';
                 }
-                if (typed == 'G') {
+                if (typed == 'G' || typed == 'g') {
                     return 'G';
                 }
-                if (typed == 'A') {
+                if (typed == 'A' || typed == 'a') {
                     return 'a';
                 }
             }
         }
     }
     public static void save(File filename, String input) throws IOException {
-//        In in = new In(filename.getName());
-//        in.readAll();
-//        Out out = new Out(filename.getName());
-//        out.println(input);
-
         FileWriter writer = new FileWriter(filename.getName(), true);
         BufferedWriter buffered = new BufferedWriter(writer);
         for (int i = 0; i < input.length(); i ++) {
             if (input.charAt(i) == 'n' || input.charAt(i) == 'N') {
-//                System.out.println("true");
                 buffered.newLine();
                 buffered.write(input.charAt(i));
             } else {
@@ -252,27 +250,15 @@ public class Drawing {
         buffered.close();
     }
 
-    //    public static void loadSave(File filename, String input) {
-//        Out out = new Out(filename.getName());
-//        out.print(input);
-//    }
-    public TETile[][] load(File filename) throws IOException {
-//        In in = new In(filename);
-//        String input = in.readLine();
-//        Out out = new Out(filename.getName());
-//        out.println(input);
-//        System.out.println(input);
-
+    public String load(File filename) throws IOException {
         FileReader reader = new FileReader(filename.getName());
         LineNumberReader lineReader = new LineNumberReader(reader);
         String lineText = null;
         String input = "";
         while ((lineText = lineReader.readLine()) != null) {
-//            System.out.println(lineText);
             input = lineText;
         }
-        System.out.println(input);
-        return Engine.interactWithInputString(input);
+        return input;
     }
 
     public TETile[][] replay(File filename, TERenderer ter) throws IOException {
@@ -281,23 +267,9 @@ public class Drawing {
         String lineText = null;
         String input = "";
         while ((lineText = lineReader.readLine()) != null) {
-//            System.out.println(lineText);
             input = lineText;
         }
-        System.out.println(input);
-        int i = 0;
-        String seed = "";
-        while (input.charAt(i) != 'c') {
-            seed += input.charAt(i);
-            i = i + 1;
-        }
-        System.out.println(seed);
-        TETile[][] world = Engine.interactWithInputString(seed);
-        String moves = seed;
-        for (int j = i; j < input.length(); j ++) {
-            moves += input.charAt(j);
-            world = Engine.interactWithInputString(moves);
-        }
+        TETile[][] world = Engine.replayInteract(input);
         return world;
     }
 
@@ -395,5 +367,65 @@ public class Drawing {
         StdDraw.text(this.width / 2, 13, "Quit (Q)");
         StdDraw.show();
         StdDraw.pause(1000000000);
+    }
+
+    public TETile[][] replayInteract(String input) {
+        // TODO: Fill out this method so that it run the engine using the input
+        // passed in as an argument, and return a 2D tile representation of the
+        // world that would have been drawn if the same inputs had been given
+        // to interactWithKeyboard().
+        //
+        // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
+        // that works for many different input types.
+        TERenderer ter = new TERenderer();
+        ter.initialize(width, height);
+        TETile[][] myWorld = new TETile[width][height];
+        ArrayList<Character> inputSplit = new ArrayList();
+        for (char ch : input.toCharArray()) {
+            inputSplit.add(ch);
+        }
+        String seed = "";
+        Avatar myPlayer = new Avatar();
+        int j = 0;
+        while (true) {
+            if (inputSplit.get(j).equals('n') || inputSplit.get(j).equals('N')) {
+                j = j + 1;
+                continue;
+            }
+            if (inputSplit.get(j).equals('s') || inputSplit.get(j).equals('S')) {
+                j = j + 1;
+                break;
+            } else {
+                seed += inputSplit.get(j);
+                j = j + 1;
+            }
+        }
+        Long longSeed = Long.valueOf(seed);
+        bigWorld big = new bigWorld();
+        big.buildBigWorld(height, width, longSeed, myWorld, myPlayer);
+        String moves = "";
+        int h = j;
+        while (h < inputSplit.size()) {
+            if (inputSplit.get(h).equals('c') || inputSplit.get(h).equals('C')) {
+                char avatarSymbol = inputSplit.get(h + 1);
+                int x = myPlayer.avTrackerGetter().x;
+                int y = myPlayer.avTrackerGetter().y;
+                myPlayer = new Avatar(avatarSymbol);
+                myPlayer.placeAvatar(x, y, myPlayer.avatar, myWorld);
+                ter.renderFrameSlow(myWorld);
+                h = h + 2;
+                continue;
+            } else if (!(inputSplit.get(h).equals(':')) || !(inputSplit.get(h).equals('q')) || !(inputSplit.get(h).equals('l'))) {
+                String nextMove = String.valueOf(inputSplit.get(h));
+                myPlayer.move(nextMove, myWorld, ter, myPlayer.avatar);
+                ter.renderFrameSlow(myWorld);
+                moves = moves + nextMove;
+                h = h + 1;
+            } else if ((inputSplit.get(h).equals(':')) || (inputSplit.get(h).equals('q')) || (inputSplit.get(h).equals('l'))) {
+                h = h + 1;
+            }
+        }
+        ter.renderFrame(myWorld);
+        return myWorld;
     }
 }

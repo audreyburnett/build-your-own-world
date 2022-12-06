@@ -1,6 +1,6 @@
 package byow.TileEngine;
-import byow.Core.Coordinate;
 
+import byow.Core.Drawing;
 import edu.princeton.cs.algs4.StdDraw;
 
 import java.awt.Color;
@@ -35,7 +35,7 @@ public class TERenderer {
         this.yOffset = yOff;
         StdDraw.setCanvasSize(width * TILE_SIZE, height * TILE_SIZE);
         Font font = new Font("Monaco", Font.BOLD, TILE_SIZE - 2);
-        StdDraw.setFont(font);      
+        StdDraw.setFont(font);
         StdDraw.setXscale(0, width);
         StdDraw.setYscale(0, height);
 
@@ -70,7 +70,7 @@ public class TERenderer {
      * given in units of tiles.
      *
      *              positions   xOffset |xOffset+1|xOffset+2| .... |xOffset+world.length
-     *                     
+     *
      * startY+world[0].length   [0][M-1] | [1][M-1] | [2][M-1] | .... | [N-1][M-1]
      *                    ...    ......  |  ......  |  ......  | .... | ......
      *               startY+2    [0][2]  |  [1][2]  |  [2][2]  | .... | [N-1][2]
@@ -99,21 +99,21 @@ public class TERenderer {
         }
         StdDraw.show();
     }
-    public void renderLightFrame(TETile[][] world, Coordinate avatar){
-        int x = avatar.x;
-        int y = avatar.y;
-        int numXTiles = 6;
-        int numYTiles = 6;
+
+    public void renderFrameSlow(TETile[][] world) {
+        int numXTiles = world.length;
+        int numYTiles = world[0].length;
         StdDraw.clear(new Color(0, 0, 0));
-        for (int start = x - 3; start < numXTiles; start += 1) {
-            for (int yStart = y - 3; yStart < numYTiles; yStart += 1) {
-                if (world[start][yStart] == null) {
-                    throw new IllegalArgumentException("Tile at position x=" + start + ", y=" + yStart
+        for (int x = 0; x < numXTiles; x += 1) {
+            for (int y = 0; y < numYTiles; y += 1) {
+                if (world[x][y] == null) {
+                    throw new IllegalArgumentException("Tile at position x=" + x + ", y=" + y
                             + " is null.");
                 }
-                world[start][yStart].draw(start + xOffset, yStart + yOffset);
+                world[x][y].draw(x + xOffset, y + yOffset);
             }
         }
         StdDraw.show();
+        StdDraw.pause(150);
     }
 }

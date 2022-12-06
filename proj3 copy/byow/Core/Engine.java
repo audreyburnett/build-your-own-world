@@ -53,7 +53,6 @@ public class Engine {
         //
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
-//        System.out.println(input);
         TERenderer ter = new TERenderer();
         ter.initialize(WIDTH, HEIGHT);
         TETile[][] myWorld = new TETile[WIDTH][HEIGHT];
@@ -64,17 +63,6 @@ public class Engine {
         String seed = "";
         Avatar myPlayer = new Avatar();
         int j = 0;
-//        if (inputSplit.get(j).equals('n')) {
-//            j = 1;
-//        } else {
-//            while (!inputSplit.get(j).equals('n')) {
-//                if (inputSplit.get(j).equals('c')) {
-//                    char avatarSymbol = inputSplit.get(j+1);
-//                    myPlayer = new Avatar(avatarSymbol);
-//                    j = j + 2;
-//                }
-//            }
-//        }
         while (true) {
             if (inputSplit.get(j).equals('n') || inputSplit.get(j).equals('N')) {
                 j = j + 1;
@@ -88,15 +76,12 @@ public class Engine {
                 j = j + 1;
             }
         }
-//        System.out.println(seed);
         Long longSeed = Long.valueOf(seed);
-        System.out.println(longSeed);
         bigWorld big = new bigWorld();
         big.buildBigWorld(HEIGHT, WIDTH, longSeed, myWorld, myPlayer);
         String moves = "";
         for(int h = j; h < inputSplit.size(); ) {
-//            System.out.println(h);
-            if (inputSplit.get(h).equals('c')) {
+            if (inputSplit.get(h).equals('c') || inputSplit.get(h).equals('C')) {
                 char avatarSymbol = inputSplit.get(h + 1);
                 int x = myPlayer.avTrackerGetter().x;
                 int y = myPlayer.avTrackerGetter().y;
@@ -117,33 +102,63 @@ public class Engine {
         return myWorld;
     }
 
-
-    public String selected() {
-        String answer = "";
+    public static TETile[][] replayInteract(String input) {
+        // TODO: Fill out this method so that it run the engine using the input
+        // passed in as an argument, and return a 2D tile representation of the
+        // world that would have been drawn if the same inputs had been given
+        // to interactWithKeyboard().
+        //
+        // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
+        // that works for many different input types.
+        TERenderer ter = new TERenderer();
+        ter.initialize(WIDTH, HEIGHT);
+        TETile[][] myWorld = new TETile[WIDTH][HEIGHT];
+        ArrayList<Character> inputSplit = new ArrayList();
+        for (char ch : input.toCharArray()) {
+            inputSplit.add(ch);
+        }
+        String seed = "";
+        Avatar myPlayer = new Avatar();
+        int j = 0;
         while (true) {
-            if (StdDraw.hasNextKeyTyped()) {
-                char typed = StdDraw.nextKeyTyped();
-                if (typed == 'T') {
-                    return "T";
-                }
-                if (typed == 'F') {
-                    return "F";
-                }
-                if (typed == 'G') {
-                    return "G";
-                }
-                if (typed == 'A') {
-                    return "a";
-                }
+            if (inputSplit.get(j).equals('n') || inputSplit.get(j).equals('N')) {
+                j = j + 1;
+                continue;
+            }
+            if (inputSplit.get(j).equals('s') || inputSplit.get(j).equals('S')) {
+                j = j + 1;
+                break;
+            } else {
+                seed += inputSplit.get(j);
+                j = j + 1;
             }
         }
+        Long longSeed = Long.valueOf(seed);
+        bigWorld big = new bigWorld();
+        big.buildBigWorld(HEIGHT, WIDTH, longSeed, myWorld, myPlayer);
+        String moves = "";
+        for(int h = j; h < inputSplit.size(); ) {
+            if (inputSplit.get(h).equals('c') || inputSplit.get(h).equals('C')) {
+                char avatarSymbol = inputSplit.get(h + 1);
+                int x = myPlayer.avTrackerGetter().x;
+                int y = myPlayer.avTrackerGetter().y;
+                myPlayer = new Avatar(avatarSymbol);
+                myPlayer.placeAvatar(x, y, myPlayer.avatar, myWorld);
+                h = h + 2;
+                continue;
+            } else if (!(inputSplit.get(h).equals(':')) || !(inputSplit.get(h).equals('q')) || !(inputSplit.get(h).equals('l'))){
+                String nextMove = String.valueOf(inputSplit.get(h));
+                myPlayer.move(nextMove, myWorld, ter, myPlayer.avatar);
+                ter.renderFrameSlow(myWorld);
+                moves = moves + nextMove;
+                h = h + 1;
+            } else if ((inputSplit.get(h).equals(':')) || (inputSplit.get(h).equals('q')) || (inputSplit.get(h).equals('l'))){
+                h = h + 1;
+            }
+        }
+        ter.renderFrame(myWorld);
+        return myWorld;
     }
-
-//    public static void save(File filename, Out out, String seed, String moves, String avatar) {
-//        out.println(seed);
-//        out.println(avatar);
-//        out.println(moves);
-//    }
 }
 
 
